@@ -1,6 +1,5 @@
 package com.people.hub.authorization.service;
 
-import com.people.hub.authorization.model.Permission;
 import com.people.hub.authorization.repository.PermissionRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
