@@ -24,7 +24,7 @@ import java.util.UUID;
 public class AuthService {
 
     @Value("${WEBSITE_BASEURL}")
-    private final String baseUrl;
+    private String baseUrl;
     private final UserRepo userRepo;
     private final ValidationTokenRepo tokenRepo;
     private final JwtUtils jwtUtils;

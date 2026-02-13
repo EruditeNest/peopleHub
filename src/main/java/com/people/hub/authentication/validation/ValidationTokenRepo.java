@@ -2,7 +2,6 @@ package com.people.hub.authentication.validation;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.lang.ScopedValue;
 import java.util.UUID;
 
 public interface ValidationTokenRepo extends JpaRepository<ValidationToken, Long> {
