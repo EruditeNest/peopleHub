@@ -24,7 +24,7 @@ import java.util.UUID;
 public class AuthService {
 
     @Value("${WEBSITE_BASEURL}")
-    private final String baseUrl;
+    private String baseUrl;
     private final UserRepo userRepo;
     private final ValidationTokenRepo tokenRepo;
     private final JwtUtils jwtUtils;
@@ -114,8 +114,13 @@ public class AuthService {
             throw new BadRequestException("Token already used or invalid");
         }
         Instant expiryDuration = Instant.now().minus(10, ChronoUnit.MINUTES);
+        if(!validationToken.getCreatedAt().isAfter(expiryDuration)) {
+            validationToken.setStatus(ValidationTokenStatus.Expired);
+            tokenRepo.save(validationToken);
+            throw new BadRequestException("Token is expired.");
+        }
 
-        return validationToken.getUuid().equals(uuid) && validationToken.getCreatedAt().isAfter(expiryDuration);
+        return validationToken.getUuid().equals(uuid);
     }
 
     // requires redis
