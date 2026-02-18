@@ -40,18 +40,16 @@ public class AuthService {
     @Transactional
     public RestApiResponse loginGenerateToken(String email, String password) {
         try{
-            User user = userRepo.findByEmail(email);
-            if(user != null) {
-                String userPassword = user.getPassword();
-                if(passwordEncoder.matches(password, userPassword)) {
-                    revokeAllRefreshTokenByUserId(user.getUserId());
-                    String refreshToken = createRefreshToken(user.getUserId()).toString();
-                    String token = jwtUtils.createToken(email, user.getRoleId(), user.getUserId());
-                    return RestApiResponse.responseJwtRefreshToken(token, refreshToken);
-                }
-                return RestApiResponse.failure("Incorrect Password");
+            User user = userRepo.findByEmail(email)
+                    .orElseThrow(() -> new BadRequestException("User not found"));
+            String userPassword = user.getPassword();
+            if(passwordEncoder.matches(password, userPassword)) {
+                revokeAllRefreshTokenByUserId(user.getUserId());
+                String refreshToken = createRefreshToken(user.getUserId()).toString();
+                String token = jwtUtils.createToken(email, user.getUserId());
+                return RestApiResponse.responseJwtRefreshToken(token, refreshToken);
             }
-            return RestApiResponse.failure("User not found");
+            return RestApiResponse.failure("Incorrect Password");
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
@@ -82,20 +80,23 @@ public class AuthService {
     }
 
     public RestApiResponse forgotPassword(String email) {
-        User user = userRepo.findByEmail(email);
-        if (user == null) {
-            return RestApiResponse.success(); // Don't reveal user existence, Attackers use that for email harvesting.
+        try{
+            User user = userRepo.findByEmail(email)
+                    .orElseThrow();
+            UUID uuid = UUID.randomUUID();
+            ValidationToken token = new ValidationToken();
+            token.setUserId(user.getUserId());
+            token.setUuid(uuid);
+            token.setStatus(ValidationTokenStatus.awaits);
+            tokenRepo.save(token);
+            String otpToken = jwtUtils.OtpToken(email, user.getUserId(), uuid.toString());
+            String link = baseUrl + "/reset-password?token=" + otpToken;
+            emailService.sendResetLinkEmail(email, link);
+            return RestApiResponse.success();
+        } catch(Exception e) {
+            log.info("ForgetPassword: {}", e.getMessage());
+            return RestApiResponse.success();
         }
-        UUID uuid = UUID.randomUUID();
-        ValidationToken token = new ValidationToken();
-        token.setUserId(user.getUserId());
-        token.setUuid(uuid);
-        token.setStatus(ValidationTokenStatus.awaits);
-        tokenRepo.save(token);
-        String otpToken = jwtUtils.OtpToken(email, user.getUserId(), uuid.toString());
-        String link = baseUrl + "/reset-password?token=" + otpToken;
-        emailService.sendResetLinkEmail(email, link);
-        return RestApiResponse.success();
     }
 
     @Transactional
@@ -107,10 +108,8 @@ public class AuthService {
         if (newPassword == null || newPassword.length() < 8) {
             throw new BadRequestException("Password must be at least 8 characters");
         }
-        User user = userRepo.findByEmail(tokenDetails.get("email"));
-        if(user == null) {
-            throw new BadRequestException("User not found");
-        }
+        User user = userRepo.findByEmail(tokenDetails.get("email"))
+            .orElseThrow(() -> new BadRequestException("User not found"));
         user.setPassword(passwordEncoder.encode(newPassword));
         revokeAllRefreshTokenByUserId(user.getUserId());
         userRepo.save(user);
@@ -148,7 +147,7 @@ public class AuthService {
 
         User user = userRepo.findById(refreshToken.getUserId())
                 .orElseThrow();
-        String newJwtToken = jwtUtils.createToken(user.getEmail(), user.getRoleId(), user.getUserId());
+        String newJwtToken = jwtUtils.createToken(user.getEmail(), user.getUserId());
         return RestApiResponse.responseJwtRefreshToken(newJwtToken, newRefreshToken);
     }
 
@@ -158,6 +157,7 @@ public class AuthService {
     }
 
     private int revokeAllRefreshTokenByUserId(Long userId) {
+        // Implement: remove the permissions of user from redis.
         return refreshTokenRepo.revokeActiveTokensByUserId(userId);
     }
 

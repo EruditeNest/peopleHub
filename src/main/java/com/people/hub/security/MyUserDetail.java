@@ -20,8 +20,6 @@ public class MyUserDetail implements UserDetails {
 
     private final String password;
 
-    private final Long roleId;
-
     private final Collection<? extends GrantedAuthority> authorities;
 
     @Override
@@ -39,22 +37,20 @@ public class MyUserDetail implements UserDetails {
         return this.username;
     }
 
-    public MyUserDetail(Long userId, String username, String email, String password, Long roleId, Collection<? extends GrantedAuthority> authorities) {
+    public MyUserDetail(Long userId, String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
         this.authorities = authorities;
         this.userId = userId;
         this.username = username;
         this.password = password;
         this.email = email;
-        this.roleId = roleId;
     }
 
-    public MyUserDetail(Long userId, String username, String email, String password, Long roleId, Set<String> authorities) {
+    public MyUserDetail(Long userId, String username, String email, String password, Set<String> authorities) {
         this.authorities = getAuthoritiesFromStringSet(authorities);
         this.userId = userId;
         this.username = username;
         this.password = password;
         this.email = email;
-        this.roleId = roleId;
     }
 
     public static Collection<? extends GrantedAuthority> getAuthoritiesFromStringSet(Set<String> permissions) {
