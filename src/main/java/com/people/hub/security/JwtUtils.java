@@ -23,12 +23,10 @@ public class JwtUtils {
     @Value("${jwt.secret}")
     private String secret;
 
-    public String createToken(String email, Long roleId, Long userId, boolean rememberMe) {
-        Date expiry = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
-        if (rememberMe) {
-            //  token Expiry will be set to 15 days     Milli * Sec * Min * Hour * Days
-            expiry = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 15);
-        }
+    public String createToken(String email, Long roleId, Long userId) {
+        long expirationTime = 1000L * 60 * 15; // 15 min
+        Date expiry = new Date(System.currentTimeMillis() + expirationTime);
+
         Claims claims = Jwts.claims()
             .subject(email)
             .add("userId", userId)

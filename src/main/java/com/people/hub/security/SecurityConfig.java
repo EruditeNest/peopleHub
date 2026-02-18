@@ -27,7 +27,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(
                 authorizeHttp -> {
-                    authorizeHttp.requestMatchers("/auth/login", "/auth/signup", "/auth/forget-password").permitAll();
+                    authorizeHttp.requestMatchers("/auth/login", "/auth/forget-password", "/auth/renew-token").permitAll();
                     authorizeHttp.anyRequest().authenticated();
                 }
             )
