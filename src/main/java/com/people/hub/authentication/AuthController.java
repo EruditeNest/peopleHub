@@ -18,7 +18,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<RestApiResponse> login(@RequestBody LoginDTO loginDTO) {
-        return ResponseEntity.ok(authService.loginGenerateToken(loginDTO.getEmail(), loginDTO.getPassword(), loginDTO.isRememberMe()));
+        return ResponseEntity.ok(authService.loginGenerateToken(loginDTO.getEmail(), loginDTO.getPassword()));
     }
 
     @PostMapping("/change-password")
@@ -36,5 +36,15 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<RestApiResponse> resetPassword(@RequestParam String token, @RequestBody String newPassword) {
         return ResponseEntity.ok(authService.resetPassword(token, newPassword));
+    }
+
+    @PostMapping("/renew-token")
+    public ResponseEntity<RestApiResponse> renewTokens(@RequestBody String token) {
+        return ResponseEntity.ok(authService.renewTokens(token));
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<RestApiResponse> logout(@AuthenticationPrincipal MyUserDetail userDetail) {
+        return ResponseEntity.ok(authService.revokeToken(userDetail));
     }
 }

@@ -72,11 +72,10 @@ public class RestApiResponse {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(successResponse);
     }
 
-    public static ResponseEntity<Map<String, Object>> responseTokenRole(String token,String role) {
+    public static RestApiResponse responseJwtRefreshToken(String token, String refreshToken) {
         Map<String, Object> successResponse = new HashMap<>();
         successResponse.put("token",token);
-        successResponse.put("role",role);
-        successResponse.put("success", true);
-        return ResponseEntity.ok(successResponse);
+        successResponse.put("refreshToken",refreshToken);
+        return new RestApiResponse(true, successResponse);
     }
 }

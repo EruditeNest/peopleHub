@@ -1,4 +1,4 @@
-package com.people.hub.authentication.validation;
+package com.people.hub.authentication.token;
 
 public enum ValidationTokenStatus {
     Consumed,
