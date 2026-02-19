@@ -23,14 +23,13 @@ public class JwtUtils {
     @Value("${jwt.secret}")
     private String secret;
 
-    public String createToken(String email, Long roleId, Long userId) {
+    public String createToken(String email, Long userId) {
         long expirationTime = 1000L * 60 * 15; // 15 min
         Date expiry = new Date(System.currentTimeMillis() + expirationTime);
 
         Claims claims = Jwts.claims()
             .subject(email)
             .add("userId", userId)
-            .add("roleId", roleId)
             .build();
         return generateToken(claims,expiry);
     }
@@ -62,7 +61,6 @@ public class JwtUtils {
             Claims claims = extractAllClaims(token.substring(7));
             Map<String, String> claimsMap = new HashMap<>();
             claimsMap.put("userId", String.valueOf(claims.get("userId")));
-            claimsMap.put("roleId", String.valueOf(claims.get("roleId")));
             claimsMap.put("email", String.valueOf(claims.getSubject()));
             return claimsMap;
         } catch (Exception e) {

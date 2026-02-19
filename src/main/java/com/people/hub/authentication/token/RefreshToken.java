@@ -1,11 +1,12 @@
 package com.people.hub.authentication.token;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
@@ -24,4 +25,14 @@ public class RefreshToken {
     private Date expiryDate;
 
     private boolean revoked;
+
+    @JsonIgnore
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @JsonIgnore
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 }

@@ -1,6 +1,7 @@
 package com.people.hub.authorization.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.people.hub.core.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
@@ -24,6 +25,9 @@ public class Role {
     private String name;
 
     private String description;
+
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    private Set<User> users;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
