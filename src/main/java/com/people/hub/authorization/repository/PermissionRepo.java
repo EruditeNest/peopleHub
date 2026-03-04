@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -16,4 +17,20 @@ public interface PermissionRepo extends JpaRepository<Permission, Long> {
         WHERE r.id = :roleId
     """)
     Set<String> findPermissionNamesByRoleId(@Param("roleId") Long roleId);
+
+    @Query("""
+        SELECT DISTINCT p.id FROM Role r
+        JOIN r.permissions p
+        WHERE r.id = :roleId
+    """)
+    Set<Long> findPermissionIdsByRoleId(@Param("roleId") Long roleId);
+
+    @Query("""
+        SELECT r.id, p.id
+        FROM Role r
+        JOIN r.permissions p
+        WHERE r.id IN :roleIds
+    """)
+    List<Object[]> findPermissionIdsByRoleIds(@Param("roleIds") Set<Long> roleIds);
+
 }

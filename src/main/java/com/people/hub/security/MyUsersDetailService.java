@@ -1,6 +1,7 @@
 package com.people.hub.security;
 
 import com.people.hub.core.common.exception.BadRequestException;
+import com.people.hub.core.common.exception.NotFoundException;
 import com.people.hub.core.user.User;
 import com.people.hub.core.user.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +25,10 @@ public class MyUsersDetailService implements UserDetailsService {
     public MyUserDetail loadUserByUsername(String email) throws UsernameNotFoundException {
 
         User user = userRepo.findByEmail(email)
-            .orElseThrow(() -> new BadRequestException("User not found"));
+            .orElseThrow(() -> new NotFoundException("user", email));
         Set<String> authorities = redisService.loadAuthorities(user.getUserId());
 
         if(authorities.isEmpty()) {
-            user = userRepo.findByEmailWithRolesAndPermissions(email)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
             authorities = rebuildWithLock(user);
         }
 
@@ -51,8 +50,7 @@ public class MyUsersDetailService implements UserDetailsService {
                 if (!cached.isEmpty()) {
                     return cached;
                 }
-                user = userRepo.findByEmailWithRolesAndPermissions(user.getEmail())
-                    .orElseThrow(() -> new BadRequestException("User not found!!!"));
+
                 return getAuthoritiesFromDb(user);
             } finally {
                 redisService.deleteLockKeyByUserId(user.getUserId());
@@ -66,6 +64,9 @@ public class MyUsersDetailService implements UserDetailsService {
     }
 
     private Set<String> getAuthoritiesFromDb(User user) {
+        User finalUser = user;
+        user = userRepo.findByEmailWithRolesAndPermissions(user.getEmail())
+            .orElseThrow(() -> new NotFoundException("User", finalUser.getUserId() + finalUser.getEmail()));
         Set<String> authorities = new HashSet<>();
 
         Map<String, String> roleIdNameForCache = new HashMap<>();
