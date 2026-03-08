@@ -1,4 +1,4 @@
-package com.people.hub.core.common.exception;
+package com.people.hub.common.exception;
 
 public class NotFoundException extends RuntimeException {
     public NotFoundException(String message) {

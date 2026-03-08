@@ -1,4 +1,4 @@
-package com.people.hub.core.common.utilities;
+package com.people.hub.common.utilities;
 
 import com.alibaba.fastjson2.JSON;
 

@@ -2,7 +2,7 @@ package com.people.hub.authorization.service;
 
 import com.people.hub.authorization.model.Permission;
 import com.people.hub.authorization.repository.PermissionRepo;
-import com.people.hub.core.common.exception.BadRequestException;
+import com.people.hub.common.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,17 +16,32 @@ import java.util.stream.Collectors;
 public class PermissionService {
     private final PermissionRepo permissionRepo;
 
+    public Permission createPermission(String name, String description) {
+        Permission permission = new Permission();
+        permission.setName(name);
+        permission.setDescription(description);
+        return permissionRepo.save(permission);
+    }
+
+    public Permission updatePermission(Long id, String name, String description) {
+        Permission permission = permissionRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Permission", id));
+        permission.setName(name);
+        permission.setDescription(description);
+        return permissionRepo.save(permission);
+    }
+
+    public Permission getPermissionById(Long id) {
+        return permissionRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Permission", id));
+    }
+
     public Set<String> getPermissionNamesByRoleId(Long roleId) {
         return permissionRepo.findPermissionNamesByRoleId(roleId);
     }
 
     public Set<Long> getPermissionIdsByRoleId(Long roleId) {
         return permissionRepo.findPermissionIdsByRoleId(roleId);
-    }
-
-    public Permission getPermissionById(Long id) {
-        return permissionRepo.findById(id)
-            .orElseThrow(() -> new BadRequestException("no permission found for Id: " + id));
     }
 
     public Set<Permission> getPermissionsByIds(Set<Long> ids) {

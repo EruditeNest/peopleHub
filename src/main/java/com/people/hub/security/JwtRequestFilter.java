@@ -1,6 +1,6 @@
 package com.people.hub.security;
 
-import com.people.hub.core.common.utilities.JsonUtils;
+import com.people.hub.common.utilities.JsonUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;

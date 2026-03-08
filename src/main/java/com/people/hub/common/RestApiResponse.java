@@ -1,6 +1,6 @@
-package com.people.hub.core.common;
+package com.people.hub.common;
 
-import com.people.hub.core.common.dto.PageInfo;
+import com.people.hub.common.dto.PageInfo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;

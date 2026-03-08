@@ -1,11 +1,11 @@
 package com.people.hub.authentication;
 
 import com.people.hub.authentication.token.*;
-import com.people.hub.core.common.RestApiResponse;
-import com.people.hub.core.common.exception.BadRequestException;
-import com.people.hub.core.common.exception.NotFoundException;
-import com.people.hub.core.user.User;
-import com.people.hub.core.user.UserRepo;
+import com.people.hub.common.RestApiResponse;
+import com.people.hub.common.exception.BadRequestException;
+import com.people.hub.common.exception.NotFoundException;
+import com.people.hub.user.User;
+import com.people.hub.user.UserRepo;
 import com.people.hub.security.JwtUtils;
 import com.people.hub.security.MyUserDetail;
 import lombok.RequiredArgsConstructor;

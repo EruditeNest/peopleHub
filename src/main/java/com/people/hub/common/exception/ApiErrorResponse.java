@@ -1,4 +1,4 @@
-package com.people.hub.core.common.exception;
+package com.people.hub.common.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

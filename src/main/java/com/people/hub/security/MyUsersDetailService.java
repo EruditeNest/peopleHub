@@ -1,9 +1,8 @@
 package com.people.hub.security;
 
-import com.people.hub.core.common.exception.BadRequestException;
-import com.people.hub.core.common.exception.NotFoundException;
-import com.people.hub.core.user.User;
-import com.people.hub.core.user.UserRepo;
+import com.people.hub.common.exception.NotFoundException;
+import com.people.hub.user.User;
+import com.people.hub.user.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -1,4 +1,4 @@
-package com.people.hub.core.common.exception;
+package com.people.hub.common.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

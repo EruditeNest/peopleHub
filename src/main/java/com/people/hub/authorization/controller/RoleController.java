@@ -3,7 +3,7 @@ package com.people.hub.authorization.controller;
 import com.people.hub.authorization.dto.RoleDto;
 import com.people.hub.authorization.model.Role;
 import com.people.hub.authorization.service.RoleService;
-import com.people.hub.core.common.RestApiResponse;
+import com.people.hub.common.RestApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.*;
 public class RoleController {
     private final RoleService roleService;
 
-    @PostMapping("/create-role")
+    @PostMapping("/create")
     public ResponseEntity<Role> createRole(@RequestBody RoleDto roleDto) {
         log.info("Post Request: create role");
         Role role = roleService.createRole(roleDto);
         return ResponseEntity.status(201).body(role);
     }
 
-    @PostMapping("/update-role")
+    @PostMapping("/update")
     public ResponseEntity<Role> updateRole(@RequestBody RoleDto roleDto) {
         log.info("Post Request: update role for id: {}", roleDto.getRoleId());
         Role role = roleService.updateRole(roleDto.getRoleId(), roleDto);

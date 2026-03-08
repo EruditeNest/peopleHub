@@ -9,17 +9,36 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.Instant;
 
 @Entity
-@Table
+@Table(
+    name = "user_role_mapping",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_user_role",
+            columnNames = {"user_id", "role_id"}
+        )
+    },
+    indexes = {
+        @Index(name = "idx_user_role_user", columnList = "user_id"),
+        @Index(name = "idx_user_role_role", columnList = "role_id")
+    }
+)
 @Data
-public class Role {
+public class UserRoleMapping {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
-    private String description;
+    @Column(name = "role_id", nullable = false)
+    private Long roleId;
+
+    @Column(nullable = false)
+    private Long createdBy;
+
+    @Column(nullable = false)
+    private Long updatedBy;
 
     @JsonIgnore
     @CreatedDate
@@ -30,4 +49,5 @@ public class Role {
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
 }
