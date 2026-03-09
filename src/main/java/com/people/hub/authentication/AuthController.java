@@ -2,7 +2,7 @@ package com.people.hub.authentication;
 
 import com.people.hub.authentication.dto.ChangePasswordDTO;
 import com.people.hub.authentication.dto.LoginDTO;
-import com.people.hub.core.common.RestApiResponse;
+import com.people.hub.common.RestApiResponse;
 import com.people.hub.security.MyUserDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

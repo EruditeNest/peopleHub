@@ -1,6 +1,6 @@
 package com.people.hub.security;
 
-import com.people.hub.core.common.exception.InvalidJwtException;
+import com.people.hub.common.exception.InvalidJwtException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;

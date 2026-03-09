@@ -1,6 +1,6 @@
 package com.people.hub.security;
 
-import com.people.hub.core.common.utilities.JsonUtils;
+import com.people.hub.common.utilities.JsonUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -64,7 +64,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             sendErrorResponse(response, 401, "tokenExpired");
         } catch (MalformedJwtException | SignatureException e) {
             sendErrorResponse(response, 401, "invalidToken");
-        }catch (Exception e){
+        } catch (Exception e){
             sendErrorResponse(response, 500, e.getMessage());
         }
     }

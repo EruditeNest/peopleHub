@@ -1,4 +1,4 @@
-package com.people.hub.core.common.dto;
+package com.people.hub.common.dto;
 
 import lombok.Data;
 

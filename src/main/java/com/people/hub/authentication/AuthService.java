@@ -1,10 +1,11 @@
 package com.people.hub.authentication;
 
 import com.people.hub.authentication.token.*;
-import com.people.hub.core.common.RestApiResponse;
-import com.people.hub.core.common.exception.BadRequestException;
-import com.people.hub.core.user.User;
-import com.people.hub.core.user.UserRepo;
+import com.people.hub.common.RestApiResponse;
+import com.people.hub.common.exception.BadRequestException;
+import com.people.hub.common.exception.NotFoundException;
+import com.people.hub.user.model.User;
+import com.people.hub.user.repository.UserRepo;
 import com.people.hub.security.JwtUtils;
 import com.people.hub.security.MyUserDetail;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class AuthService {
     public RestApiResponse loginGenerateToken(String email, String password) {
         try{
             User user = userRepo.findByEmail(email)
-                    .orElseThrow(() -> new BadRequestException("User not found"));
+                    .orElseThrow(() -> new NotFoundException("User", email));
             String userPassword = user.getPassword();
             if(passwordEncoder.matches(password, userPassword)) {
                 revokeAllRefreshTokenByUserId(user.getUserId());
@@ -59,7 +60,7 @@ public class AuthService {
     public RestApiResponse changePassword(String oldPassword, String newPassword, String confirmPassword, MyUserDetail userDetails) {
 
         User user = userRepo.findById(userDetails.getUserId())
-                .orElseThrow(() -> new BadRequestException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User", userDetails.getUserId()));
 
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new BadRequestException("Old password is incorrect");
@@ -109,7 +110,7 @@ public class AuthService {
             throw new BadRequestException("Password must be at least 8 characters");
         }
         User user = userRepo.findByEmail(tokenDetails.get("email"))
-            .orElseThrow(() -> new BadRequestException("User not found"));
+            .orElseThrow(() -> new NotFoundException("User", tokenDetails.get("email")));
         user.setPassword(passwordEncoder.encode(newPassword));
         revokeAllRefreshTokenByUserId(user.getUserId());
         userRepo.save(user);

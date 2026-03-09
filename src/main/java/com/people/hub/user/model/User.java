@@ -1,14 +1,12 @@
-package com.people.hub.core.user;
+package com.people.hub.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.people.hub.authorization.model.Role;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.Instant;
-import java.util.Set;
 
 @Entity
 @Data
@@ -27,14 +25,6 @@ public class User {
     private String password;
 
     private String phoneNumber;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles;
 
     @JsonIgnore
     private boolean isDeleted;

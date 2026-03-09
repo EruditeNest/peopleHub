@@ -1,35 +1,44 @@
 package com.people.hub.security;
 
-import com.people.hub.core.common.exception.BadRequestException;
-import com.people.hub.core.user.User;
-import com.people.hub.core.user.UserRepo;
-import lombok.RequiredArgsConstructor;
+import com.people.hub.common.exception.NotFoundException;
+import com.people.hub.user.model.User;
+import com.people.hub.user.repository.UserRepo;
+import com.people.hub.user.repository.UserRoleRepo;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
-@RequiredArgsConstructor
 public class MyUsersDetailService implements UserDetailsService {
 
     private final UserRepo userRepo;
+    private final UserRoleRepo userRoleRepo;
     private final RedisService redisService;
+    private final AuthorityProvider authorityProvider;
+
+    MyUsersDetailService(
+        UserRepo userRepo,
+        UserRoleRepo userRoleRepo,
+        RedisService redisService,
+        @Qualifier("dbAuthorityProvider") AuthorityProvider authorityProvider
+    ) {
+        this.userRepo = userRepo;
+        this.userRoleRepo = userRoleRepo;
+        this.redisService = redisService;
+        this.authorityProvider = authorityProvider;
+    }
 
     @Override
     public MyUserDetail loadUserByUsername(String email) throws UsernameNotFoundException {
 
         User user = userRepo.findByEmail(email)
-            .orElseThrow(() -> new BadRequestException("User not found"));
+            .orElseThrow(() -> new NotFoundException("user", email));
         Set<String> authorities = redisService.loadAuthorities(user.getUserId());
 
         if(authorities.isEmpty()) {
-            user = userRepo.findByEmailWithRolesAndPermissions(email)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
             authorities = rebuildWithLock(user);
         }
 
@@ -51,8 +60,7 @@ public class MyUsersDetailService implements UserDetailsService {
                 if (!cached.isEmpty()) {
                     return cached;
                 }
-                user = userRepo.findByEmailWithRolesAndPermissions(user.getEmail())
-                    .orElseThrow(() -> new BadRequestException("User not found!!!"));
+
                 return getAuthoritiesFromDb(user);
             } finally {
                 redisService.deleteLockKeyByUserId(user.getUserId());
@@ -66,20 +74,27 @@ public class MyUsersDetailService implements UserDetailsService {
     }
 
     private Set<String> getAuthoritiesFromDb(User user) {
+        User finalUser = user;
+        user = userRepo.findByEmail(user.getEmail())
+            .orElseThrow(() -> new NotFoundException("User", finalUser.getUserId().toString(), finalUser.getEmail()));
         Set<String> authorities = new HashSet<>();
-
         Map<String, String> roleIdNameForCache = new HashMap<>();
-        user.getRoles().forEach(role -> {
+
+        Set<Long> respectiveRoleIds = userRoleRepo.findAllRoleIdsByUserId(user.getUserId());
+        Map<Long, String> roleIdName = authorityProvider.getRoleIdNameById(respectiveRoleIds);
+        Map<Long, Set<String>> permissionsByRoleId = authorityProvider.getPermissionsByRoleId(respectiveRoleIds);
+
+        roleIdName.forEach((roleId, roleName) -> {
             Set<String> permissionForCache = new HashSet<>();
-            authorities.add(RedisEnum.roleAuthority(role.getName()));
+            authorities.add(RedisEnum.roleAuthority(roleName));
 
-            roleIdNameForCache.put(String.valueOf(role.getId()), role.getName());
+            roleIdNameForCache.put(String.valueOf(roleId), roleName);
 
-            role.getPermissions().forEach(permission -> {
-                authorities.add(permission.getName());
-                permissionForCache.add(permission.getName());
+            permissionsByRoleId.get(roleId).forEach((permissionName) -> {
+                authorities.add(permissionName);
+                permissionForCache.add(permissionName);
             });
-            redisService.cacheRolePermissions(role.getId(), permissionForCache);
+            redisService.cacheRolePermissions(roleId, permissionForCache);
         });
 
         redisService.cacheUserRoles(user.getUserId(), roleIdNameForCache);

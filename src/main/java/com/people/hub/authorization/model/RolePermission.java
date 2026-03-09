@@ -9,17 +9,30 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.Instant;
 
 @Entity
-@Table
 @Data
-public class Role {
+@Table(
+    name = "role_permission",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_role_permission",
+            columnNames = {"role_id, permission_id"}
+        )
+    },
+    indexes = {
+        @Index(name = "idx_role_permission_role", columnList = "role_id"),
+        @Index(name = "idx_role_permission_permission", columnList = "permission_id")
+    }
+)
+public class RolePermission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
+    @Column(name = "role_id", nullable = false)
+    private Long roleId;
 
-    private String description;
+    @Column(name = "permission_id", nullable = false)
+    private Long permissionId;
 
     @Column(nullable = false)
     private Long createdBy;

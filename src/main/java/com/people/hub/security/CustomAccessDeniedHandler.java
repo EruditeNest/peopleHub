@@ -1,6 +1,6 @@
 package com.people.hub.security;
 
-import com.people.hub.core.common.utilities.JsonUtils;
+import com.people.hub.common.utilities.JsonUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
