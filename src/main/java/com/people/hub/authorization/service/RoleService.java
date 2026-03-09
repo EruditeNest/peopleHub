@@ -1,11 +1,13 @@
 package com.people.hub.authorization.service;
 
 import com.people.hub.authorization.dto.RoleDto;
+import com.people.hub.authorization.dto.RolePermissionResponse;
 import com.people.hub.authorization.model.Permission;
 import com.people.hub.authorization.model.Role;
 import com.people.hub.authorization.repository.RoleRepo;
 import com.people.hub.common.RestApiResponse;
 import com.people.hub.common.dto.PageInfo;
+import com.people.hub.common.exception.ForbiddenException;
 import com.people.hub.common.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,20 +29,26 @@ import java.util.stream.Collectors;
 public class RoleService {
     private final RoleRepo roleRepo;
     private final PermissionService permissionService;
+    private final RolePermissionService rolePermissionService;
 
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("id", "name", "created_at", "updated_at");
 
     @Transactional
     public Role createRole(RoleDto roleDto) {
-        log.info("create role initiated");
+        log.info("Creating role: {}", roleDto.getName());
+
+        if(roleRepo.existsByName(roleDto.getName())) {
+            throw new ForbiddenException("Role already exists: " + roleDto.getName());
+        }
+
         Role role = new Role();
         role.setName(roleDto.getName());
         role.setDescription(roleDto.getDescription());
-
-        Set<Permission> permissions = permissionService.getPermissionsByIds(roleDto.getPermissionIds());
-
-        role.setPermissions(permissions);
-        return roleRepo.save(role);
+        role.setCreatedBy(roleDto.getCreatedBy());
+        role.setUpdatedBy(roleDto.getUpdatedBy());
+        Role savedRole = roleRepo.save(role);
+        rolePermissionService.createRolePermissionMapping(savedRole.getId(), roleDto.getPermissionIds(), roleDto.getCreatedBy());
+        return savedRole;
     }
 
     @Transactional
@@ -50,11 +58,15 @@ public class RoleService {
             .orElseThrow(() -> new NotFoundException("Role", id));
         role.setName(roleDto.getName());
         role.setDescription(roleDto.getDescription());
-
-        Set<Permission> permissions = permissionService.getPermissionsByIds(roleDto.getPermissionIds());
-
-        role.setPermissions(permissions);
-        return roleRepo.save(role);
+        role.setUpdatedBy(roleDto.getUpdatedBy());
+        Role savedRole = roleRepo.save(role);
+        rolePermissionService.updateRolePermissionMapping(
+            savedRole.getId(),
+            roleDto.getPermissionIds(),
+            roleDto.getCreatedBy(),
+            roleDto.getUpdatedBy()
+        );
+        return savedRole;
     }
 
     public Role getRoleById(Long id) {
@@ -64,11 +76,13 @@ public class RoleService {
         return role;
     }
 
-    public Role getRoleByIdWithPermissions(Long id) {
+    public RolePermissionResponse getRoleByIdWithPermissions(Long id) {
         log.info("getRoleByIdWithPermission with id: {}", id);
-        Role role = roleRepo.findRoleByIdWithPermissions(id)
-                .orElseThrow(() -> new NotFoundException("Role", id));
-        return role;
+        Role role = roleRepo.findById(id)
+            .orElseThrow(() -> new NotFoundException("Role", id));
+        Set<Long> permissionIds = rolePermissionService.getPermissionIdsByRoleId(id);
+        Set<Permission> respectivePermissions = permissionService.getPermissionsByIds(permissionIds);
+        return new RolePermissionResponse(role, respectivePermissions);
     }
 
     public RoleDto getRoleByIdWithPermissionIds(Long id) {
@@ -81,6 +95,8 @@ public class RoleService {
                 role.getName(),
                 role.getDescription(),
                 permissionIds,
+                role.getCreatedBy(),
+                role.getUpdatedBy(),
                 role.getCreatedAt(),
                 role.getUpdatedAt()
         );
@@ -132,6 +148,8 @@ public class RoleService {
                     role.getName(),
                     role.getDescription(),
                     roleIdPermissionIdsMap.getOrDefault(role.getId(), Collections.emptySet()),
+                    role.getCreatedBy(),
+                    role.getUpdatedBy(),
                     role.getCreatedAt(),
                     role.getUpdatedAt()
             )
@@ -148,7 +166,7 @@ public class RoleService {
                 .orElseThrow(() -> new NotFoundException("Role", id));
 
         roleRepo.delete(role);
-
+        rolePermissionService.deleteAllByRoleId(id);
         return RestApiResponse.success("Role deleted successfully");
     }
 }

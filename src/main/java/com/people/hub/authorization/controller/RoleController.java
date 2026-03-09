@@ -1,6 +1,7 @@
 package com.people.hub.authorization.controller;
 
 import com.people.hub.authorization.dto.RoleDto;
+import com.people.hub.authorization.dto.RolePermissionResponse;
 import com.people.hub.authorization.model.Role;
 import com.people.hub.authorization.service.RoleService;
 import com.people.hub.common.RestApiResponse;
@@ -37,7 +38,7 @@ public class RoleController {
     }
 
     @GetMapping("/with-permissions/{id}")
-    public ResponseEntity<Role> getRoleByIdWithPermissions(@PathVariable Long id) {
+    public ResponseEntity<RolePermissionResponse> getRoleByIdWithPermissions(@PathVariable Long id) {
         log.info("Get Request: get role with permissions for id: {}", id);
         return ResponseEntity.ok(roleService.getRoleByIdWithPermissions(id));
     }

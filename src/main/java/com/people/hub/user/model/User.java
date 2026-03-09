@@ -1,4 +1,4 @@
-package com.people.hub.user;
+package com.people.hub.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

@@ -67,6 +67,24 @@ public class ControllerExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ApiErrorResponse> handleForbiddenException(
+            ForbiddenException ex,
+            HttpServletRequest request
+    ) {
+        log.error("Forbidden access attempted: ", ex);
+
+        ApiErrorResponse response = ApiErrorResponse.builder()
+            .message(ex.getMessage())
+            .status(HttpStatus.FORBIDDEN.value())
+            .error(HttpStatus.FORBIDDEN.getReasonPhrase())
+            .path(request.getRequestURI())
+            .timestamp(LocalDateTime.now())
+            .build();
+
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGlobalException(
             Exception ex,

@@ -20,6 +20,10 @@ public class RoleDto {
 
     private Set<Long> permissionIds;
 
+    private Long createdBy;
+
+    private Long updatedBy;
+
     private Instant createdAt;
 
     private Instant updatedAt;

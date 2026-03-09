@@ -21,6 +21,12 @@ public class Role {
 
     private String description;
 
+    @Column(nullable = false)
+    private Long createdBy;
+
+    @Column(nullable = false)
+    private Long updatedBy;
+
     @JsonIgnore
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

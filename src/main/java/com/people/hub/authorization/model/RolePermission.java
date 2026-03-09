@@ -9,30 +9,30 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.Instant;
 
 @Entity
+@Data
 @Table(
-    name = "user_role_mapping",
+    name = "role_permission",
     uniqueConstraints = {
         @UniqueConstraint(
-            name = "uk_user_role",
-            columnNames = {"user_id", "role_id"}
+            name = "uk_role_permission",
+            columnNames = {"role_id, permission_id"}
         )
     },
     indexes = {
-        @Index(name = "idx_user_role_user", columnList = "user_id"),
-        @Index(name = "idx_user_role_role", columnList = "role_id")
+        @Index(name = "idx_role_permission_role", columnList = "role_id"),
+        @Index(name = "idx_role_permission_permission", columnList = "permission_id")
     }
 )
-@Data
-public class UserRoleMapping {
+public class RolePermission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
     @Column(name = "role_id", nullable = false)
     private Long roleId;
+
+    @Column(name = "permission_id", nullable = false)
+    private Long permissionId;
 
     @Column(nullable = false)
     private Long createdBy;
@@ -49,5 +49,4 @@ public class UserRoleMapping {
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-
 }

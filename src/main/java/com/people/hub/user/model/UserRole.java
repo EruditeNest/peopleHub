@@ -1,4 +1,4 @@
-package com.people.hub.authorization.model;
+package com.people.hub.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -9,30 +9,30 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.Instant;
 
 @Entity
-@Data
 @Table(
-    name = "role_permission_mapping",
+    name = "user_role",
     uniqueConstraints = {
         @UniqueConstraint(
-            name = "uk_role_permission",
-            columnNames = {"role_id, permission_id"}
+            name = "uk_user_role",
+            columnNames = {"user_id", "role_id"}
         )
     },
     indexes = {
-        @Index(name = "idx_role_permission_role", columnList = "role_id"),
-        @Index(name = "idx_role_permission_permission", columnList = "permission_id")
+        @Index(name = "idx_user_role_user", columnList = "user_id"),
+        @Index(name = "idx_user_role_role", columnList = "role_id")
     }
 )
-public class RolePermissionMapping {
+@Data
+public class UserRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
     @Column(name = "role_id", nullable = false)
     private Long roleId;
-
-    @Column(name = "permission_id", nullable = false)
-    private Long permissionId;
 
     @Column(nullable = false)
     private Long createdBy;
@@ -49,4 +49,5 @@ public class RolePermissionMapping {
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
 }
