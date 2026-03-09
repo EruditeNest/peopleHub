@@ -3,6 +3,7 @@ package com.people.hub.authorization.service;
 import com.people.hub.authorization.dto.RoleDto;
 import com.people.hub.authorization.dto.RolePermissionResponse;
 import com.people.hub.authorization.model.Permission;
+import com.people.hub.authorization.model.PermissionGroup;
 import com.people.hub.authorization.model.Role;
 import com.people.hub.authorization.repository.RoleRepo;
 import com.people.hub.common.RestApiResponse;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
 public class RoleService {
     private final RoleRepo roleRepo;
     private final PermissionService permissionService;
+    private final PermissionGroupService permissionGroupService;
     private final RolePermissionService rolePermissionService;
 
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("id", "name", "created_at", "updated_at");
@@ -80,16 +83,28 @@ public class RoleService {
         log.info("getRoleByIdWithPermission with id: {}", id);
         Role role = roleRepo.findById(id)
             .orElseThrow(() -> new NotFoundException("Role", id));
+
         Set<Long> permissionIds = rolePermissionService.getPermissionIdsByRoleId(id);
         Set<Permission> respectivePermissions = permissionService.getPermissionsByIds(permissionIds);
-        return new RolePermissionResponse(role, respectivePermissions);
+
+        Map<Long, Set<Permission>> permissionByGroup = respectivePermissions.stream()
+            .collect(Collectors.groupingBy(
+                Permission::getPermissionGroupId,
+                Collectors.toSet()
+            ));
+
+        Set<Long> permissionGroupIds = respectivePermissions.stream()
+                .map(Permission::getPermissionGroupId)
+                .collect(Collectors.toSet());
+        Set<PermissionGroup> permissionGroups = new HashSet<>(permissionGroupService.getAllPermissionGroupsById(permissionGroupIds));
+        return new RolePermissionResponse(role, permissionByGroup, permissionGroups);
     }
 
     public RoleDto getRoleByIdWithPermissionIds(Long id) {
         log.info("getRoleByIdWithPermissionIds with id: {}", id);
         Role role = roleRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Role", id));
-        Set<Long> permissionIds = permissionService.getPermissionIdsByRoleId(id);
+        Set<Long> permissionIds = rolePermissionService.getPermissionIdsByRoleId(id);
         RoleDto roleDto = new RoleDto(
                 role.getId(),
                 role.getName(),
@@ -140,7 +155,7 @@ public class RoleService {
                 .map(Role::getId)
                 .collect(Collectors.toSet());
 
-        Map<Long, Set<Long>> roleIdPermissionIdsMap = permissionService.mapPermissionsIdsByRoleIds(roleIds);
+        Map<Long, Set<Long>> roleIdPermissionIdsMap = rolePermissionService.getPermissionIdsByRoleIds(roleIds);
 
         Page<RoleDto> roleDtoPage = roles.map(role ->
             new RoleDto(

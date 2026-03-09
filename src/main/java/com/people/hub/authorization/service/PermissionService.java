@@ -16,32 +16,30 @@ import java.util.stream.Collectors;
 public class PermissionService {
     private final PermissionRepo permissionRepo;
 
-    public Permission createPermission(String name, String description) {
+    public Permission createPermission(String name, String description, Long groupId) {
         Permission permission = new Permission();
         permission.setName(name);
         permission.setDescription(description);
+        permission.setPermissionGroupId(groupId);
         return permissionRepo.save(permission);
     }
 
-    public Permission updatePermission(Long id, String name, String description) {
+    public Permission updatePermission(Long id, String name, String description, Long groupId) {
         Permission permission = permissionRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Permission", id));
         permission.setName(name);
         permission.setDescription(description);
+        permission.setPermissionGroupId(groupId);
         return permissionRepo.save(permission);
+    }
+
+    public List<Permission> getAllPermissions() {
+        return permissionRepo.findAll();
     }
 
     public Permission getPermissionById(Long id) {
         return permissionRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Permission", id));
-    }
-
-    public Set<String> getPermissionNamesByRoleId(Long roleId) {
-        return permissionRepo.findPermissionNamesByRoleId(roleId);
-    }
-
-    public Set<Long> getPermissionIdsByRoleId(Long roleId) {
-        return permissionRepo.findPermissionIdsByRoleId(roleId);
     }
 
     public Set<Permission> getPermissionsByIds(Set<Long> ids) {
@@ -58,20 +56,5 @@ public class PermissionService {
             log.info("Ids not found while getting permissions: {}", missingIds);
         }
         return new HashSet<>(permissions);
-    }
-
-    public Map<Long, Set<Long>> mapPermissionsIdsByRoleIds(Set<Long> roleIds) {
-        List<Object[]> results = permissionRepo.findPermissionIdsByRoleIds(roleIds);
-
-        Map<Long, Set<Long>> permissionMap = new HashMap<>();
-        for (Object[] row : results) {
-            Long roleId = (Long) row[0];
-            Long permissionId = (Long) row[1];
-
-            permissionMap
-                    .computeIfAbsent(roleId, k -> new HashSet<>())
-                    .add(permissionId);
-        }
-        return permissionMap;
     }
 }

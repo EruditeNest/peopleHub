@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -15,6 +14,8 @@ import java.util.Set;
 public interface RolePermissionRepo extends JpaRepository<RolePermission, Long> {
 
     boolean existsByRoleId(Long roleId);
+
+    List<RolePermission> findByRoleIdIn(Set<Long> roleIds);
 
     @Modifying
     int deleteAllByRoleId(Long roleId);
@@ -30,10 +31,10 @@ public interface RolePermissionRepo extends JpaRepository<RolePermission, Long> 
     Set<Long> findPermissionIdsByRoleId(@Param("roleId") Long roleId);
 
     @Query("""
-        SELECT rpm.roleId, p.name
-        FROM RolePermissionMapping rpm
-        JOIN Permission p ON p.id = rpm.permissionId
-        WHERE rpm.roleId IN :roleIds
+        SELECT rp.roleId, p.name
+        FROM RolePermission rp
+        JOIN Permission p ON p.id = rp.permissionId
+        WHERE rp.roleId IN :roleIds
     """)
     List<Object[]> findRolePermissions(@Param("roleIds") Set<Long> roleIds);
 }

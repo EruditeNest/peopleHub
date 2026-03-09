@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,15 +39,11 @@ public class RolePermissionService {
         }
         Set<Long> existingPermissionIds = rolePermissionRepo.findPermissionIdsByRoleId(roleId);
 
-        Set<Long> toDelete = new HashSet<>(existingPermissionIds);
-        toDelete.removeAll(permissionIds);
+        deleteFromExistingMapping(roleId, existingPermissionIds, permissionIds);
 
         Set<Long> toAdd = new HashSet<>(permissionIds);
         toAdd.removeAll(existingPermissionIds);
 
-        if (!toDelete.isEmpty()) {
-            rolePermissionRepo.deleteByRoleIdAndPermissionIdIn(roleId, toDelete);
-        }
         if (toAdd.isEmpty()) {
             return List.of();
         }
@@ -60,8 +58,31 @@ public class RolePermissionService {
         return rolePermissionRepo.findPermissionIdsByRoleId(roleId);
     }
 
+    public Map<Long, Set<Long>> getPermissionIdsByRoleIds(Set<Long> roleIds) {
+        if(roleIds == null || roleIds.isEmpty()) {
+            throw new ForbiddenException("Invalid roleIds: " + roleIds);
+        }
+
+        List<RolePermission> mappings = rolePermissionRepo.findByRoleIdIn(roleIds);
+
+        return mappings.stream()
+            .collect(Collectors.groupingBy(
+                RolePermission::getRoleId,
+                Collectors.mapping(RolePermission::getPermissionId, Collectors.toSet())
+            ));
+    }
+
     public int deleteAllByRoleId(Long roleId) {
         return rolePermissionRepo.deleteAllByRoleId(roleId);
+    }
+
+    private void deleteFromExistingMapping(Long roleId, Set<Long> existingPermissionIds, Set<Long> permissionIds) {
+        Set<Long> toDelete = new HashSet<>(existingPermissionIds);
+        toDelete.removeAll(permissionIds);
+
+        if (!toDelete.isEmpty()) {
+            rolePermissionRepo.deleteByRoleIdAndPermissionIdIn(roleId, toDelete);
+        }
     }
 
     private RolePermission buildRolePermission(Long roleId, Long permissionId, Long createdBy, Long updatedBy) {

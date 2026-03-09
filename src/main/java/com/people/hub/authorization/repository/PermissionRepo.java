@@ -11,19 +11,6 @@ import java.util.Set;
 
 @Repository
 public interface PermissionRepo extends JpaRepository<Permission, Long> {
-    @Query("""
-        SELECT DISTINCT p.name FROM Role r
-        JOIN r.permissions p
-        WHERE r.id = :roleId
-    """)
-    Set<String> findPermissionNamesByRoleId(@Param("roleId") Long roleId);
-
-    @Query("""
-        SELECT DISTINCT p.id FROM Role r
-        JOIN r.permissions p
-        WHERE r.id = :roleId
-    """)
-    Set<Long> findPermissionIdsByRoleId(@Param("roleId") Long roleId);
 
     @Query("""
         SELECT r.id, p.id

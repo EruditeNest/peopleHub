@@ -9,24 +9,15 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.Instant;
 
 @Entity
-@Table(,
-    indexes = {
-        @Index(name = "idx_permission_group", columnList = "permission_group_id")
-    }
-)
 @Data
-public class Permission {
+public class PermissionGroup {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String name; // RESOURCE_ACTION - naming convention
-
+    private String name;
     private String description;
-
-    @Column(name = "permission_group_id")
-    private Long permissionGroupId;
 
     @JsonIgnore
     @CreatedDate
