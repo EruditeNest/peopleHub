@@ -21,6 +21,12 @@ public interface RolePermissionRepo extends JpaRepository<RolePermission, Long> 
     int deleteAllByRoleId(Long roleId);
 
     @Modifying
+    int deleteAllByPermissionId(Long permissionId);
+
+    @Modifying
+    int deleteAllByPermissionIdIn(Set<Long> permissionId);
+
+    @Modifying
     int deleteByRoleIdAndPermissionIdIn(Long roleId, Set<Long> permissionIds);
 
     @Query("""

@@ -3,6 +3,7 @@ package com.people.hub.authorization.controller;
 import com.people.hub.authorization.dto.PermissionDto;
 import com.people.hub.authorization.model.Permission;
 import com.people.hub.authorization.service.PermissionService;
+import com.people.hub.common.RestApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class PermissionController {
         return ResponseEntity.ok(permission);
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<Permission>> getAllPermissions() {
         return ResponseEntity.ok(permissionService.getAllPermissions());
     }
@@ -53,5 +54,27 @@ public class PermissionController {
     @PostMapping("/by-ids")
     public ResponseEntity<Set<Permission>> getPermissionsByIds(@RequestBody Set<Long> ids) {
         return ResponseEntity.ok(permissionService.getPermissionsByIds(ids));
+    }
+
+    @GetMapping("/by-permission_group_id")
+    public ResponseEntity<Set<Permission>> getPermissionsByPermissionGroupId(@RequestParam Long id) {
+        return ResponseEntity.ok(permissionService.getPermissionsByPermissionGroupId(id));
+    }
+
+    @PostMapping("/by-permission_group_ids")
+    public ResponseEntity<Set<Permission>> getPermissionsByPermissionGroupIds(@RequestBody Set<Long> ids) {
+        return ResponseEntity.ok(permissionService.getPermissionsByPermissionGroupIds(ids));
+    }
+
+    @PostMapping("/delete-by-ids")
+    public ResponseEntity<RestApiResponse> deleteAllPermissionsById(@RequestBody Set<Long> ids) {
+        permissionService.deleteAllPermissionsById(ids);
+        return ResponseEntity.ok(RestApiResponse.success());
+    }
+
+    @GetMapping("/delete/{id}")
+    public ResponseEntity<RestApiResponse> deletePermissionById(@PathVariable Long id) {
+        permissionService.deletePermissionById(id);
+        return ResponseEntity.ok(RestApiResponse.success());
     }
 }
