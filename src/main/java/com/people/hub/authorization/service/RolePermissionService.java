@@ -76,6 +76,14 @@ public class RolePermissionService {
         return rolePermissionRepo.deleteAllByRoleId(roleId);
     }
 
+    public int deleteAllByPermissionId(Long permissionId) {
+        return rolePermissionRepo.deleteAllByPermissionId(permissionId);
+    }
+
+    public int deleteAllByPermissionIds(Set<Long> permissionIds) {
+        return rolePermissionRepo.deleteAllByPermissionIdIn(permissionIds);
+    }
+
     private void deleteFromExistingMapping(Long roleId, Set<Long> existingPermissionIds, Set<Long> permissionIds) {
         Set<Long> toDelete = new HashSet<>(existingPermissionIds);
         toDelete.removeAll(permissionIds);
