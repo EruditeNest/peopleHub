@@ -26,18 +26,14 @@ public class User {
 
     private String phoneNumber;
 
-    @JsonIgnore
     private boolean isDeleted;
 
-    @JsonIgnore
     private boolean isActive;
 
-    @JsonIgnore
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @JsonIgnore
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;

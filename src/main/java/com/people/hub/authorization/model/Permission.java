@@ -1,6 +1,5 @@
 package com.people.hub.authorization.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
@@ -28,12 +27,10 @@ public class Permission {
     @Column(name = "permission_group_id")
     private Long permissionGroupId;
 
-    @JsonIgnore
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @JsonIgnore
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;

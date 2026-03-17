@@ -15,6 +15,22 @@ public interface UserRoleRepo extends JpaRepository<UserRole, Long> {
 
     Set<UserRole> findAllByRoleId(Long roleId);
 
+    Set<UserRole> findAllByRoleIdIn(Set<Long> roleIds);
+
+    Set<UserRole> findAllByUserIdIn(Set<Long> userIds);
+
+    int deleteAllByUserId(Long userId);
+
+    int deleteAllByRoleId(Long roleId);
+
+    int deleteAllByRoleIdIn(Set<Long> roleIds);
+
+    int deleteAllByUserIdIn(Set<Long> userIds);
+
+    Set<UserRole> findAllByUserIdAndRoleIdIn(Long userId, Set<Long> roleIds);
+
+    int deleteAllByUserIdAndRoleIdIn(Long userId, Set<Long> roleIds);
+
     @Query("""
         SELECT DISTINCT(urm.roleId)
         FROM UserRoleMapping urm

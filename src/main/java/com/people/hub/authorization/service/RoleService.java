@@ -8,10 +8,12 @@ import com.people.hub.authorization.model.Role;
 import com.people.hub.authorization.repository.RoleRepo;
 import com.people.hub.common.RestApiResponse;
 import com.people.hub.common.dto.PageInfo;
+import com.people.hub.common.event.RoleDeletedEvent;
 import com.people.hub.common.exception.ForbiddenException;
 import com.people.hub.common.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +35,7 @@ public class RoleService {
     private final PermissionService permissionService;
     private final PermissionGroupService permissionGroupService;
     private final RolePermissionService rolePermissionService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("id", "name", "created_at", "updated_at");
 
@@ -180,8 +183,9 @@ public class RoleService {
         Role role = roleRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Role", id));
 
-        roleRepo.delete(role);
         rolePermissionService.deleteAllByRoleId(id);
+        applicationEventPublisher.publishEvent(new RoleDeletedEvent(Set.of(id)));
+        roleRepo.delete(role);
         return RestApiResponse.success("Role deleted successfully");
     }
 }
