@@ -1,11 +1,13 @@
-package com.people.hub.task.enums;
+package com.people.hub.taskmanager.enums;
 
 public enum StatusEnum {
-    Completed,
-    Pending,
-    NotStarted,
-    Review,
-    Testing,
-    OnHold,
-    ReadyForProduction
+    COMPLETED,
+    PENDING,
+    NOT_STARTED,
+    REVIEW,
+    TESTING,
+    ON_HOLD,
+    READY_FOR_PRODUCTION,
+    CANCELLED,
+    ARCHIVED
 }

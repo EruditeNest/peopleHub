@@ -1,8 +1,8 @@
-package com.people.hub.task.enums;
+package com.people.hub.taskmanager.enums;
 
 public enum PriorityEnum {
-    Low,
-    Medium,
-    High,
-    Urgent
+    LOW,
+    MEDIUM,
+    HIGH,
+    URGENT
 }

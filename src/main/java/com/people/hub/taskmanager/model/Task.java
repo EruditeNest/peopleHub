@@ -1,7 +1,7 @@
-package com.people.hub.task.model;
+package com.people.hub.taskmanager.model;
 
-import com.people.hub.task.enums.PriorityEnum;
-import com.people.hub.task.enums.StatusEnum;
+import com.people.hub.taskmanager.enums.PriorityEnum;
+import com.people.hub.taskmanager.enums.StatusEnum;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
@@ -9,7 +9,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Data
@@ -32,8 +31,6 @@ public class Task {
 
     private LocalDate dueDate;
     private int requiredManDays;
-
-    private List<Long> followers;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
