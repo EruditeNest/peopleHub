@@ -6,8 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public interface UserRepo extends JpaRepository<User, Long> {
@@ -20,5 +20,5 @@ public interface UserRepo extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
-    Page<User> findByIdIn(Set<Long> userIds, Pageable pageable);
+    Page<User> findByIdIn(Collection<Long> userIds, Pageable pageable);
 }

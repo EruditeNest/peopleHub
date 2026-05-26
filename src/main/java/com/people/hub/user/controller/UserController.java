@@ -69,10 +69,16 @@ public class UserController {
     }
 
     @PostMapping("all-by-ids")
-    public ResponseEntity<RestApiResponse> getUserById(@PathVariable List<Long> userIds) {
+    public ResponseEntity<RestApiResponse> getAllUserByIds(
+            @PathVariable List<Long> userIds,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "created_at") String sortField,
+            @RequestParam(defaultValue = "desc") String sortOrder
+    ) {
         log.info("GET /api/users/{} - Fetching user by id", userIds);
-        List<User> users = userService.getAllUserByIds(userIds);
-        return ResponseEntity.ok(RestApiResponse.success(users));
+        RestApiResponse restApiResponse = userService.getAllUserByIds(userIds, page, size, sortField, sortOrder);
+        return ResponseEntity.ok(restApiResponse);
     }
 
     @GetMapping("/by-username")

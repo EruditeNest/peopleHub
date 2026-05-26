@@ -122,9 +122,14 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}/members")
-    public ResponseEntity<RestApiResponse> getMembers(@PathVariable Long projectId) {
-        List<User> members = projectService.getMembers(projectId);
-        return ResponseEntity.ok(RestApiResponse.success(members));
+    public ResponseEntity<RestApiResponse> getMembers(
+            @PathVariable Long projectId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "created_at") String sortField,
+            @RequestParam(defaultValue = "desc") String sortOrder) {
+        RestApiResponse response = projectService.getMembers(projectId, page, size, sortField, sortOrder);
+        return ResponseEntity.ok(response);
     }
 
     // FOLLOWERS

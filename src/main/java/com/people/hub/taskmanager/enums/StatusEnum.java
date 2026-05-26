@@ -9,5 +9,7 @@ public enum StatusEnum {
     ON_HOLD,
     READY_FOR_PRODUCTION,
     CANCELLED,
-    ARCHIVED
+    ARCHIVED,
+    ACTIVE,
+    IN_ACTIVE
 }

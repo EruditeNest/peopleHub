@@ -11,13 +11,12 @@ import com.people.hub.common.dto.PageInfo;
 import com.people.hub.common.event.RoleDeletedEvent;
 import com.people.hub.common.exception.ForbiddenException;
 import com.people.hub.common.exception.NotFoundException;
+import com.people.hub.common.utilities.PageableUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -123,14 +122,8 @@ public class RoleService {
 
     public RestApiResponse getAllRoles(int page, int size, String sortField, String sortOrder) {
         log.info("getAllRoles with page: {}, size: {}, sortField: {}, sortOrder: {}", page, size, sortField, sortOrder);
-        if (!ALLOWED_SORT_FIELDS.contains(sortField)) {
-            sortField = "created_at";
-        }
-        Sort sort = sortOrder.equalsIgnoreCase("asc")
-                ? Sort.by(sortField).ascending()
-                : Sort.by(sortField).descending();
 
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable = PageableUtils.getPageable(page, size, sortField, sortOrder, ALLOWED_SORT_FIELDS);
         Page<Role> roles = roleRepo.findAll(pageable);
         PageInfo pageInfo = new PageInfo(roles.getNumber(), roles.getSize(), roles.getTotalElements());
         return RestApiResponse.success(pageInfo, roles.getContent());
@@ -138,14 +131,8 @@ public class RoleService {
 
     public RestApiResponse getAllRolesWithPermissionIds(int page, int size, String sortField, String sortOrder) {
         log.info("getAllRolesWithPermissionIds with page: {}, size: {}, sortField: {}, sortOrder: {}", page, size, sortField, sortOrder);
-        if (!ALLOWED_SORT_FIELDS.contains(sortField)) {
-            sortField = "created_at";
-        }
-        Sort sort = sortOrder.equalsIgnoreCase("asc")
-                ? Sort.by(sortField).ascending()
-                : Sort.by(sortField).descending();
 
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable = PageableUtils.getPageable(page, size, sortField, sortOrder, ALLOWED_SORT_FIELDS);
         Page<Role> roles = roleRepo.findAll(pageable);
         PageInfo pageInfo = new PageInfo(roles.getNumber(), roles.getSize(), roles.getTotalElements());
 

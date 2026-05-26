@@ -1,5 +1,6 @@
 package com.people.hub.taskmanager.model;
 
+import com.people.hub.taskmanager.enums.AccessState;
 import com.people.hub.taskmanager.enums.StatusEnum;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -22,6 +23,9 @@ public class Project {
 
     @Enumerated(EnumType.STRING)
     private StatusEnum status;
+
+    @Enumerated(EnumType.STRING)
+    private AccessState accessState;
 
     private Long managerId;
     private Long clientId;
