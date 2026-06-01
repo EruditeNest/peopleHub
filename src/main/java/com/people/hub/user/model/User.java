@@ -26,9 +26,9 @@ public class User {
 
     private String phoneNumber;
 
-    private boolean isDeleted;
+    private boolean deleted;
 
-    private boolean isActive;
+    private boolean active;
 
     private String designation;
 

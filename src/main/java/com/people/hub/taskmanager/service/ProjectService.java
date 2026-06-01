@@ -3,11 +3,11 @@ package com.people.hub.taskmanager.service;
 import com.people.hub.common.RestApiResponse;
 import com.people.hub.common.dto.PageInfo;
 import com.people.hub.common.exception.NotFoundException;
+import com.people.hub.common.service.UserServicePort;
 import com.people.hub.common.utilities.PageableUtils;
 import com.people.hub.taskmanager.enums.StatusEnum;
 import com.people.hub.taskmanager.model.*;
 import com.people.hub.taskmanager.repo.ProjectRepo;
-import com.people.hub.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -41,7 +41,7 @@ public class ProjectService {
     private final ProjectMemberService projectMemberService;
     private final ProjectFollowerService projectFollowerService;
     private final ProjectTeamService projectTeamService;
-    private final UserService userService;
+    private final UserServicePort userServicePort;
     private final TeamService teamService;
     private final TaskService taskService;
 
@@ -78,6 +78,25 @@ public class ProjectService {
 
         Pageable pageable = PageableUtils.getPageable(page, size, sortField, sortOrder, ALLOWED_SORT_FIELDS);
         Page<Project> projects = projectRepo.findAll(pageable);
+        PageInfo pageInfo = new PageInfo(projects.getNumber(), projects.getSize(), projects.getTotalElements());
+        return RestApiResponse.success(pageInfo, projects.getContent());
+    }
+
+    public RestApiResponse getProjectsByMemberId(Long memberId, int page, int size, String sortField, String sortOrder){
+        log.info("getProjectsByMemberId for memberId: {}, with page: {}, size: {}, sortField: {}, sortOrder: {}", memberId, page, size, sortField, sortOrder);
+        List<Long> projectIds = projectMemberService.getProjectsIdsByMemberId(memberId);
+
+        Pageable pageable = PageableUtils.getPageable(page, size, sortField, sortOrder, ALLOWED_SORT_FIELDS);
+        Page<Project> projects = projectRepo.findAllByIdIn(projectIds, pageable);
+        PageInfo pageInfo = new PageInfo(projects.getNumber(), projects.getSize(), projects.getTotalElements());
+        return RestApiResponse.success(pageInfo, projects.getContent());
+    }
+
+    public RestApiResponse getProjectsByTeamId(Long teamId, int page, int size, String sortField, String sortOrder){
+        List<Long> projectIds = projectTeamService.getProjectIdsByTeamId(teamId);
+
+        Pageable pageable = PageableUtils.getPageable(page, size, sortField, sortOrder, ALLOWED_SORT_FIELDS);
+        Page<Project> projects = projectRepo.findAllByIdIn(projectIds, pageable);
         PageInfo pageInfo = new PageInfo(projects.getNumber(), projects.getSize(), projects.getTotalElements());
         return RestApiResponse.success(pageInfo, projects.getContent());
     }
@@ -138,95 +157,137 @@ public class ProjectService {
     public RestApiResponse addMember(
             Long projectId,
             Long memberId){
-        projectMemberService.addMember(projectId, memberId);
-        return RestApiResponse.success("Member(" + memberId + ") added to the project(" + projectId + ") successfully");
+        if (!isDeleted(projectId) && activeUserExistsById(memberId)) {
+            projectMemberService.addMember(projectId, memberId);
+            return RestApiResponse.success("Member(" + memberId + ") added to the project(" + projectId + ") successfully");
+        }
+        return RestApiResponse.failure();
     }
 
     public RestApiResponse removeMember(
             Long projectId,
             Long memberId){
-        projectMemberService.removeMember(projectId, memberId);
-        return RestApiResponse.success("Member(" + memberId + ") removed from the project(" + projectId + ") successfully");
+        if (!isDeleted(projectId) && activeUserExistsById(memberId)) {
+            projectMemberService.removeMember(projectId, memberId);
+            return RestApiResponse.success("Member(" + memberId + ") removed from the project(" + projectId + ") successfully");
+        }
+        return RestApiResponse.failure();
     }
 
     public RestApiResponse addMemberByIds(
             Long projectId,
             List<Long> memberIds){
-        projectMemberService.addMemberByIds(projectId, memberIds);
-        return RestApiResponse.success("Members(" + memberIds + ") added to the project(" + projectId + ") successfully");
+        Set<Long> uniqueMemberIds = getAllActiveUserIds(memberIds);
+        if(!isDeleted(projectId) && !uniqueMemberIds.isEmpty()) {
+            projectMemberService.addMemberByIds(projectId, uniqueMemberIds);
+            return RestApiResponse.success("Members(" + uniqueMemberIds + ") added to the project(" + projectId + ") successfully");
+        }
+        return RestApiResponse.failure();
     }
 
     public RestApiResponse removeMemberByIds(
             Long projectId,
             List<Long> memberIds){
-        projectMemberService.removeMemberByIds(projectId, memberIds);
-        return RestApiResponse.success("Member(" + memberIds + ") removed from the project(" + projectId + ")");
+        Set<Long> uniqueMemberIds = getAllActiveUserIds(memberIds);
+        if(!isDeleted(projectId) && !uniqueMemberIds.isEmpty()) {
+            projectMemberService.removeMemberByIds(projectId, uniqueMemberIds);
+            return RestApiResponse.success("Member(" + uniqueMemberIds + ") removed from the project(" + projectId + ")");
+        }
+        return RestApiResponse.failure();
     }
 
     public RestApiResponse getMembers(Long projectId, int page, int size, String sortField, String sortOrder){
         List<Long> memberIds = projectMemberService.getMemberIdsByProjectId(projectId);
-        return userService.getAllUserByIds(memberIds, page, size, sortField, sortOrder);
+        return userServicePort.getAllUserByIds(memberIds, page, size, sortField, sortOrder);
     }
 
     public RestApiResponse addFollower(
             Long projectId,
             Long userId){
-        projectFollowerService.addFollower(projectId, userId);
-        return RestApiResponse.success("Follower(" + userId + ") added to the project(" + projectId + ") successfully");
+        if (!isDeleted(projectId) && activeUserExistsById(userId)) {
+            projectFollowerService.addFollower(projectId, userId);
+            return RestApiResponse.success("Follower(" + userId + ") added to the project(" + projectId + ") successfully");
+        }
+        return RestApiResponse.failure();
     }
 
     public RestApiResponse removeFollower(
             Long projectId,
             Long userId){
-        projectFollowerService.removeFollower(projectId, userId);
-        return RestApiResponse.success("Follower(" + userId + ") does not exist in the project(" + projectId + ")");
+        if (!isDeleted(projectId) && activeUserExistsById(userId)) {
+            projectFollowerService.removeFollower(projectId, userId);
+            return RestApiResponse.success("Follower(" + userId + ") does not exist in the project(" + projectId + ")");
+        }
+        return RestApiResponse.failure();
     }
 
     public RestApiResponse addFollowerByIds(
             Long projectId,
             List<Long> userIds){
-        projectFollowerService.addFollowerByIds(projectId, userIds);
-        return RestApiResponse.success("Follower(" + userIds + ") added to the project(" + projectId + ") successfully");
+        Set<Long> uniqueFollowerIds = getAllActiveUserIds(userIds);
+        if(!isDeleted(projectId) && !uniqueFollowerIds.isEmpty()) {
+            projectFollowerService.addFollowerByIds(projectId, uniqueFollowerIds);
+            return RestApiResponse.success("Follower(" + uniqueFollowerIds + ") added to the project(" + projectId + ") successfully");
+        }
+        return RestApiResponse.failure();
     }
 
     public RestApiResponse removeFollowerByIds(
             Long projectId,
             List<Long> userIds){
-        projectFollowerService.removeFollowerByIds(projectId, userIds);
-        return RestApiResponse.success("Follower(" + userIds + ") removed from the project(" + projectId + ") successfully");
+        Set<Long> uniqueFollowerIds = getAllActiveUserIds(userIds);
+        if(!isDeleted(projectId) && !uniqueFollowerIds.isEmpty()) {
+            projectFollowerService.removeFollowerByIds(projectId, uniqueFollowerIds);
+            return RestApiResponse.success("Follower(" + uniqueFollowerIds + ") removed from the project(" + projectId + ") successfully");
+        }
+        return RestApiResponse.failure();
     }
 
     public RestApiResponse getFollowers(Long projectId, int page, int size, String sortField, String sortOrder){
         List<Long> followerIds = projectFollowerService.getFollowerIdsByProjectId(projectId);
-        return userService.getAllUserByIds(followerIds, page, size, sortField, sortOrder);
+        return userServicePort.getAllUserByIds(followerIds, page, size, sortField, sortOrder);
     }
 
     public RestApiResponse addTeam(
             Long projectId,
             Long teamId){
-        projectTeamService.addTeam(projectId, teamId);
-        return RestApiResponse.success("Team(" + teamId + ") added to the project(" + projectId + ") successfully");
+        if (!isDeleted(projectId) && teamExistsById(teamId)) {
+            projectTeamService.addTeam(projectId, teamId);
+            return RestApiResponse.success("Team(" + teamId + ") added to the project(" + projectId + ") successfully");
+        }
+        return RestApiResponse.failure();
     }
 
     public RestApiResponse removeTeam(
             Long projectId,
             Long teamId){
-        projectTeamService.removeTeam(projectId, teamId);
-        return RestApiResponse.success("Team(" + teamId + ") removed from the project(" + projectId + ") successfully");
+        if (!isDeleted(projectId) && teamExistsById(teamId)) {
+            projectTeamService.removeTeam(projectId, teamId);
+            return RestApiResponse.success("Team(" + teamId + ") removed from the project(" + projectId + ") successfully");
+        }
+        return RestApiResponse.failure();
     }
 
     public RestApiResponse addTeamByIds(
             Long projectId,
             List<Long> teamIds){
-        projectTeamService.addTeamByIds(projectId, teamIds);
-        return RestApiResponse.success("All Teams added to the project(" + projectId + ") successfully");
+        Set<Long> uniqueTeamIds = getAllExistingTeamIds(teamIds);
+        if(!isDeleted(projectId) && !uniqueTeamIds.isEmpty()) {
+            projectTeamService.addTeamByIds(projectId, uniqueTeamIds);
+            return RestApiResponse.success("All Teams added to the project(" + projectId + ") successfully");
+        }
+        return RestApiResponse.failure();
     }
 
     public RestApiResponse removeTeamByIds(
             Long projectId,
             List<Long> teamIds){
-        projectTeamService.removeTeamByIds(projectId, teamIds);
-        return RestApiResponse.success("Team(" + teamIds + ") removed from the project(" + projectId + ") successfully");
+        Set<Long> uniqueTeamIds = getAllExistingTeamIds(teamIds);
+        if(!isDeleted(projectId) && !uniqueTeamIds.isEmpty()) {
+            projectTeamService.removeTeamByIds(projectId, uniqueTeamIds);
+            return RestApiResponse.success("Team(" + teamIds + ") removed from the project(" + projectId + ") successfully");
+        }
+        return RestApiResponse.failure();
     }
 
     public RestApiResponse getTeams(Long projectId, int page, int size, String sortField, String sortOrder){
@@ -242,5 +303,21 @@ public class ProjectService {
         Project project = projectRepo.findById(projectId)
                 .orElseThrow(() -> new NotFoundException("Project not found", projectId));
         return project.isDeleted();
+    }
+
+    private boolean activeUserExistsById(Long id){
+        return userServicePort.activeUserExistsById(id);
+    }
+
+    private Set<Long> getAllActiveUserIds(List<Long> ids){
+        return userServicePort.getAllActiveUserIds(ids);
+    }
+
+    private boolean teamExistsById(Long id) {
+        return teamService.existsById(id);
+    }
+
+    private Set<Long> getAllExistingTeamIds(List<Long> ids) {
+        return teamService.getAllExistingTeamIds(ids);
     }
 }

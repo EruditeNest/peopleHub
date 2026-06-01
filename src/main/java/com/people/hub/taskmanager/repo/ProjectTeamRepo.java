@@ -50,6 +50,13 @@ public interface ProjectTeamRepo extends JpaRepository<ProjectTeam, Long> {
        """)
     List<Long> findTeamIdsByProjectId(@Param("projectId") Long projectId);
 
+    @Query("""
+       SELECT pt.projectId
+       FROM ProjectTeam pt
+       WHERE pt.teamId = :teamId
+       """)
+    List<Long> findProjectIdsByTeamId(@Param("teamId") Long teamId);
+
     @Transactional
     @Modifying
     void deleteByProjectIdAndTeamIdIn(Long projectId, Collection<Long> uniqueTeamIds);

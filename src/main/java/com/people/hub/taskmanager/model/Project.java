@@ -31,7 +31,7 @@ public class Project {
     private Long clientId;
     private LocalDate startDate;
     private LocalDate endDate;
-    private boolean isDeleted;
+    private boolean deleted;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

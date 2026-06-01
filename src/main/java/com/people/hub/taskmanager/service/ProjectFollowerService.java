@@ -38,7 +38,7 @@ public class ProjectFollowerService {
 
     public void addFollowerByIds(
             Long projectId,
-            List<Long> userIds){
+            Set<Long> userIds){
         List<ProjectFollower> projectFollowerList = new ArrayList<>();
         for(Long id: userIds) {
             ProjectFollower projectFollower = new ProjectFollower();
@@ -51,7 +51,7 @@ public class ProjectFollowerService {
 
     public void removeFollowerByIds(
             Long projectId,
-            List<Long> userIds){
+            Set<Long> userIds){
         Set<Long> uniqueFollowerIds = new HashSet<>(userIds);
 
         List<Long> existingFollowerIds = projectFollowerRepo.findAllFollowerIdsByProjectIdAndFollowerIdsIN(projectId, uniqueFollowerIds);

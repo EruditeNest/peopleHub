@@ -37,7 +37,7 @@ public class ProjectTeamService {
 
     public void addTeamByIds(
             Long projectId,
-            List<Long> teamIds){
+            Set<Long> teamIds){
         List<ProjectTeam> projectTeamsToSave = new ArrayList<>();
         for(Long teamId: teamIds) {
             ProjectTeam projectTeam = new ProjectTeam();
@@ -50,7 +50,7 @@ public class ProjectTeamService {
 
     public void removeTeamByIds(
             Long projectId,
-            List<Long> teamIds){
+            Set<Long> teamIds){
         Set<Long> uniqueTeamIds = new HashSet<>(teamIds);
 
         List<Long> existingTeamIds = projectTeamRepo.findAllTeamIdsByProjectIdAndTeamIdsIN(projectId, uniqueTeamIds);
@@ -67,5 +67,9 @@ public class ProjectTeamService {
 
     public List<Long> getTeamIdsByProjectId(Long projectId){
         return projectTeamRepo.findTeamIdsByProjectId(projectId);
+    }
+
+    public List<Long> getProjectIdsByTeamId(Long projectId){
+        return projectTeamRepo.findProjectIdsByTeamId(projectId);
     }
 }

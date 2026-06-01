@@ -133,4 +133,12 @@ public class UserService {
         userRoleService.deleteUserRoleByUserId(userId);
         return RestApiResponse.success();
     }
+
+    public boolean activeUserExistsById(Long id){
+        return userRepo.existsByIdAndDeletedFalseAndActiveTrue(id);
+    }
+
+    public Set<Long> getAllActiveUserIds(List<Long> ids){
+        return userRepo.getAllActiveUserIds(ids);
+    }
 }

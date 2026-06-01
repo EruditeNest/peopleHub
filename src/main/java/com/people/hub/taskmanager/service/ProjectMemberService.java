@@ -39,7 +39,7 @@ public class ProjectMemberService {
 
     public void addMemberByIds(
             Long projectId,
-            List<Long> memberIds){
+            Set<Long> memberIds){
         List<ProjectMember> allNewMembers = new ArrayList<>();
         for(Long id: memberIds) {
             ProjectMember projectMember = new ProjectMember();
@@ -52,7 +52,7 @@ public class ProjectMemberService {
 
     public void removeMemberByIds(
             Long projectId,
-            List<Long> memberIds){
+            Set<Long> memberIds){
         Set<Long> uniqueMemberIds = new HashSet<>(memberIds);
 
         List<Long> existingMemberIds = projectMemberRepo.findAllMemberIdsByProjectIdAndMemberIdsIN(projectId, uniqueMemberIds);
@@ -69,5 +69,9 @@ public class ProjectMemberService {
 
     public List<Long> getMemberIdsByProjectId(Long projectId){
         return projectMemberRepo.findMemberIdsByProjectId(projectId);
+    }
+
+    public List<Long> getProjectsIdsByMemberId(Long memberId){
+        return projectMemberRepo.findProjectIdsByMemberId(memberId);
     }
 }

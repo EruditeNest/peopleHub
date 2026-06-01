@@ -50,13 +50,20 @@ public interface ProjectMemberRepo extends JpaRepository<ProjectMember, Long> {
        """)
     List<Long> findMemberIdsByProjectId(@Param("projectId") Long projectId);
 
+    @Query("""
+       SELECT pm.projectId
+       FROM ProjectMember pm
+       WHERE pm.memberId = :memberId
+       """)
+    List<Long> findProjectIdsByMemberId(@Param("memberId") Long memberId);
+
     @Transactional
     @Modifying
-    void deleteByProjectIdAndMemberIdIn(Long projectId, Collection<Long> uniqueMemberIds);
+    int deleteByProjectIdAndMemberIdIn(Long projectId, Collection<Long> uniqueMemberIds);
 
     List<ProjectMember> findAllByProjectId(Long projectId);
 
-    void deleteByProjectIdAndMemberId(
+    int deleteByProjectIdAndMemberId(
             Long projectId,
             Long memberId
     );
