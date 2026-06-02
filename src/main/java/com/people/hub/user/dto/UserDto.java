@@ -19,4 +19,6 @@ public class UserDto {
     private Set<Long> roleIds;
 
     private boolean isActive;
+
+    private String designation;
 }

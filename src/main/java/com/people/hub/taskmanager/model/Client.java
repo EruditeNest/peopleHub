@@ -1,6 +1,5 @@
-package com.people.hub.user.model;
+package com.people.hub.taskmanager.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
@@ -10,27 +9,15 @@ import java.time.Instant;
 
 @Entity
 @Data
-@Table(name = "users")
-public class User {
+public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
-
-    private String username;
-
-    @Column(name = "email", unique = true)
+    private Long id;
+    private String name;
+    private String description;
+    private String address;
     private String email;
-
-    @JsonIgnore
-    private String password;
-
-    private String phoneNumber;
-
-    private boolean deleted;
-
-    private boolean active;
-
-    private String designation;
+    private String contact;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -39,5 +26,4 @@ public class User {
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-
 }

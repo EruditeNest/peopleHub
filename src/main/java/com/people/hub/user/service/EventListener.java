@@ -9,7 +9,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
-public class RoleEventListener {
+public class EventListener {
 
     private final UserRoleService userRoleService;
 

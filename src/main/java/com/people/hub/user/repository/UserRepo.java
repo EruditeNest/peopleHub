@@ -4,8 +4,11 @@ import com.people.hub.user.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,5 +23,18 @@ public interface UserRepo extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
-    Page<User> findByIdIn(Set<Long> userIds, Pageable pageable);
+    boolean existsById(Long id);
+
+    boolean existsByIdAndDeletedFalseAndActiveTrue(Long id);
+
+    @Query("""
+        SELECT u.id
+        FROM User u
+        WHERE u.id IN :ids
+          AND u.deleted = false
+          AND u.active = true
+    """)
+    Set<Long> getAllActiveUserIds(List<Long> ids);
+
+    Page<User> findByIdIn(Collection<Long> userIds, Pageable pageable);
 }

@@ -55,6 +55,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         // Store userId in request attribute for later use
                         Long roleId = jwtUtil.extractRoleId(jwt);
                         request.setAttribute("roleId", roleId);
+                        Long userId = jwtUtil.extractUserId(jwt);
+                        request.setAttribute("userId", userId);
                     }
                 }
             }

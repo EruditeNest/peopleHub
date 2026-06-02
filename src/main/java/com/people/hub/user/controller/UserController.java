@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -65,6 +66,19 @@ public class UserController {
         log.info("GET /api/users/{} - Fetching user by id", userId);
         RestApiResponse response = userService.getUserById(userId);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("all-by-ids")
+    public ResponseEntity<RestApiResponse> getAllUserByIds(
+            @PathVariable List<Long> userIds,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "created_at") String sortField,
+            @RequestParam(defaultValue = "desc") String sortOrder
+    ) {
+        log.info("GET /api/users/{} - Fetching user by id", userIds);
+        RestApiResponse restApiResponse = userService.getAllUserByIds(userIds, page, size, sortField, sortOrder);
+        return ResponseEntity.ok(restApiResponse);
     }
 
     @GetMapping("/by-username")
