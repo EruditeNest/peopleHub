@@ -1,13 +1,18 @@
 package com.people.hub.taskmanager.controller;
 
+import com.people.hub.common.RestApiResponse;
+import com.people.hub.taskmanager.dto.ChecklistDto;
+import com.people.hub.taskmanager.dto.TaskDto;
+import com.people.hub.taskmanager.dto.TimeLogDto;
 import com.people.hub.taskmanager.enums.StatusEnum;
 import com.people.hub.taskmanager.model.Task;
 import com.people.hub.taskmanager.model.TaskChecklist;
-import com.people.hub.taskmanager.model.TaskFollower;
 import com.people.hub.taskmanager.model.TaskTimeLog;
 import com.people.hub.taskmanager.service.TaskService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,40 +27,36 @@ public class TaskController {
     private final TaskService taskService;
 
     // CRUD
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Task> createTask(
-            @RequestBody CreateTaskRequest request) {
+            @RequestBody TaskDto taskDto,
+            HttpServletRequest request) {
 
-        return ResponseEntity.ok(
-                taskService.createTask(request));
+        Long userId = (Long) request.getAttribute("userId");
+        return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(taskDto, userId));
     }
 
     @GetMapping("/{taskId}")
-    public ResponseEntity<Task> getTaskById(
-            @PathVariable Long taskId) {
-
-        return ResponseEntity.ok(
-                taskService.getTaskById(taskId));
+    public ResponseEntity<Task> getTaskById(@PathVariable Long taskId) {
+        return ResponseEntity.ok(taskService.getTaskById(taskId));
     }
 
     @GetMapping
-    public ResponseEntity<Page<Task>> getTasks(
-            Pageable pageable) {
-
-        return ResponseEntity.ok(
-                taskService.getTasks(pageable));
+    public ResponseEntity<RestApiResponse> getTasks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "created_at") String sortField,
+            @RequestParam(defaultValue = "desc") String sortOrder
+    ) {
+        return ResponseEntity.ok(taskService.getTasks(page, size, sortField, sortOrder));
     }
 
-    @PutMapping("/{taskId}")
-    public ResponseEntity<Task> updateTask(
-            @PathVariable Long taskId,
-            @RequestBody UpdateTaskRequest request) {
-
-        return ResponseEntity.ok(
-                taskService.updateTask(taskId, request));
+    @PostMapping("/update/{taskId}")
+    public ResponseEntity<Task> updateTask(@PathVariable Long taskId, @RequestBody TaskDto taskDto) {
+        return ResponseEntity.ok(taskService.updateTask(taskId, taskDto));
     }
 
-    @DeleteMapping("/{taskId}")
+    @PostMapping("/delete/{taskId}")
     public ResponseEntity<Void> deleteTask(
             @PathVariable Long taskId) {
 
@@ -64,7 +65,7 @@ public class TaskController {
     }
 
     // STATUS
-    @PatchMapping("/{taskId}/status")
+    @PostMapping("/{taskId}/status")
     public ResponseEntity<Task> changeStatus(
             @PathVariable Long taskId,
             @RequestParam StatusEnum status) {
@@ -74,48 +75,75 @@ public class TaskController {
     }
 
     // ASSIGNMENT
-    @PatchMapping("/{taskId}/assign/{userId}")
-    public ResponseEntity<Task> assignTask(
+    @PostMapping("/{taskId}/assign/{userId}")
+    public ResponseEntity<RestApiResponse> assignTask(
             @PathVariable Long taskId,
             @PathVariable Long userId) {
+        return ResponseEntity.ok(taskService.assignTask(taskId, userId));
+    }
 
-        return ResponseEntity.ok(
-                taskService.assignTask(taskId, userId));
+    @PostMapping("/{taskId}/assign")
+    public ResponseEntity<RestApiResponse> assignTaskByMemberIds(
+            @PathVariable Long taskId,
+            @RequestBody List<Long> userIds) {
+        return ResponseEntity.ok(taskService.assignTaskByMemberIds(taskId, userIds));
+    }
+
+    @PostMapping("/{taskId}/assign/{memberId}")
+    public ResponseEntity<RestApiResponse> removeAssigneeByMemberId(
+            @PathVariable Long taskId,
+            @PathVariable Long memberId){
+        return ResponseEntity.ok(taskService.removeAssignee(taskId, memberId));
+    }
+
+    @PostMapping("/{taskId}/assign")
+    public ResponseEntity<RestApiResponse> removeAssigneeByMemberIds(
+            @PathVariable Long taskId,
+            @RequestBody List<Long> memberIds){
+        return ResponseEntity.ok(taskService.removeAssigneeByMemberIds(taskId, memberIds));
     }
 
     // CHECKLIST
-    @PostMapping("/{taskId}/checklists")
+    @PostMapping("/checklists/add")
     public ResponseEntity<TaskChecklist> addChecklist(
-            @PathVariable Long taskId,
-            @RequestBody CreateChecklistRequest request) {
+            @RequestBody ChecklistDto checklistDto,
+            HttpServletRequest request) {
 
-        return ResponseEntity.ok(
-                taskService.addChecklist(taskId, request));
+        Long userId = (Long) request.getAttribute("userId");
+        return ResponseEntity.ok(taskService.addChecklist(checklistDto, userId));
     }
 
-    @PutMapping("/checklists/{checklistId}")
+    @PostMapping("/checklists/update/{checklistId}")
     public ResponseEntity<TaskChecklist> updateChecklist(
             @PathVariable Long checklistId,
-            @RequestBody UpdateChecklistRequest request) {
+            @RequestBody ChecklistDto checklistDto,
+            HttpServletRequest request) {
 
-        return ResponseEntity.ok(
-                taskService.updateChecklist(checklistId, request));
+        Long userId = (Long) request.getAttribute("userId");
+        return ResponseEntity.ok(taskService.updateChecklist(checklistId, checklistDto, userId));
     }
 
-    @PatchMapping("/checklists/{checklistId}/complete")
-    public ResponseEntity<Void> markChecklistComplete(
-            @PathVariable Long checklistId) {
+    @PostMapping("/checklists/complete/{checklistId}")
+    public ResponseEntity<RestApiResponse> markChecklistComplete(
+            @PathVariable Long checklistId,
+            HttpServletRequest request) {
 
-        taskService.markChecklistComplete(checklistId);
-        return ResponseEntity.ok().build();
+        Long userId = (Long) request.getAttribute("userId");
+        return ResponseEntity.ok(taskService.markChecklistComplete(checklistId, userId));
     }
 
-    @DeleteMapping("/checklists/{checklistId}")
-    public ResponseEntity<Void> deleteChecklist(
+    @PostMapping("/checklists/un-complete/{checklistId}")
+    public ResponseEntity<RestApiResponse> markChecklistUncomplete(
             @PathVariable Long checklistId) {
 
-        taskService.deleteChecklist(checklistId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(taskService.markChecklistUncomplete(checklistId));
+    }
+
+    @PostMapping("/checklists/delete/{checklistId}")
+    public ResponseEntity<RestApiResponse> deleteChecklist(
+            @PathVariable Long checklistId) {
+
+        return ResponseEntity.ok(taskService.deleteChecklist(checklistId));
     }
 
     @GetMapping("/{taskId}/checklists")
@@ -127,55 +155,58 @@ public class TaskController {
     }
 
     // FOLLOWERS
-    @PostMapping("/{taskId}/followers/{userId}")
-    public ResponseEntity<Void> addFollower(
+    @PostMapping("/{taskId}/followers/add/{userId}")
+    public ResponseEntity<RestApiResponse> addFollower(
             @PathVariable Long taskId,
             @PathVariable Long userId) {
-
-        taskService.addFollower(taskId, userId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(taskService.addFollower(taskId, userId));
     }
 
-    @DeleteMapping("/{taskId}/followers/{userId}")
-    public ResponseEntity<Void> removeFollower(
+    @PostMapping("/{taskId}/followers/remove/{userId}")
+    public ResponseEntity<RestApiResponse> removeFollower(
             @PathVariable Long taskId,
             @PathVariable Long userId) {
+        return ResponseEntity.ok(taskService.removeFollower(taskId, userId));
+    }
+    @PostMapping("/{taskId}/followers/add")
+    public ResponseEntity<RestApiResponse> addFollowerByUserIds(
+            @PathVariable Long taskId,
+            @RequestBody List<Long> userIds) {
+        return ResponseEntity.ok(taskService.addFollowerByUserIds(taskId, userIds));
+    }
 
-        taskService.removeFollower(taskId, userId);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/{taskId}/followers/remove")
+    public ResponseEntity<RestApiResponse> removeFollowerByUserIds(
+            @PathVariable Long taskId,
+            @RequestBody List<Long> userIds) {
+        return ResponseEntity.ok(taskService.removeFollowerByUserIds(taskId, userIds));
     }
 
     @GetMapping("/{taskId}/followers")
-    public ResponseEntity<List<TaskFollower>> getFollowers(
-            @PathVariable Long taskId) {
+    public ResponseEntity<RestApiResponse> getFollowers(@PathVariable Long taskId) {
 
-        return ResponseEntity.ok(
-                taskService.getFollowers(taskId));
+        return ResponseEntity.ok(taskService.getFollowers(taskId));
     }
 
     // TIME LOGS
-    @PostMapping("/{taskId}/time-logs")
-    public ResponseEntity<TaskTimeLog> addTimeLog(
-            @PathVariable Long taskId,
-            @RequestBody CreateTaskTimeLogRequest request) {
+    @PostMapping("/time-logs")
+    public ResponseEntity<TaskTimeLog> addTimeLog(@RequestBody TimeLogDto timeLogDto) {
 
-        return ResponseEntity.ok(
-                taskService.addTimeLog(taskId, request));
+        return ResponseEntity.ok(taskService.addTimeLog(timeLogDto));
     }
 
     @GetMapping("/{taskId}/time-logs")
-    public ResponseEntity<List<TaskTimeLog>> getTimeLogs(
-            @PathVariable Long taskId) {
-
-        return ResponseEntity.ok(
-                taskService.getTimeLogs(taskId));
+    public ResponseEntity<List<TaskTimeLog>> getTimeLogsByTaskId(@PathVariable Long taskId) {
+        return ResponseEntity.ok(taskService.getTimeLogsByTaskId(taskId));
     }
 
-    @DeleteMapping("/time-logs/{timeLogId}")
-    public ResponseEntity<Void> deleteTimeLog(
-            @PathVariable Long timeLogId) {
+    @GetMapping("/{taskId}/time-logs/{userId}")
+    public ResponseEntity<List<TaskTimeLog>> getTimeLogsByTaskIdAndUserId(@PathVariable Long taskId, @PathVariable Long userId) {
+        return ResponseEntity.ok(taskService.getTimeLogsByTaskIdAndUserId(taskId, userId));
+    }
 
-        taskService.deleteTimeLog(timeLogId);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/time-logs/delete/{timeLogId}")
+    public ResponseEntity<RestApiResponse> deleteTimeLog(@PathVariable Long timeLogId) {
+        return ResponseEntity.ok(taskService.deleteTimeLog(timeLogId));
     }
 }

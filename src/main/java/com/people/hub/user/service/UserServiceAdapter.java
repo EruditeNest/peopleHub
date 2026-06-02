@@ -21,6 +21,11 @@ public class UserServiceAdapter implements UserServicePort {
     }
 
     @Override
+    public RestApiResponse getAllUserByIds(List<Long> userIds) {
+        return userService.getAllUserByIds(userIds);
+    }
+
+    @Override
     public boolean activeUserExistsById(Long id){
         return userService.activeUserExistsById(id);
     }

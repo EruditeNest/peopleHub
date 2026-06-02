@@ -19,6 +19,7 @@ public class TaskChecklist {
     private Long taskId;
     private Long createdBy;
     private Long updatedBy;
+    private Long completedBy;
     private boolean isCompleted;
 
     @CreatedDate

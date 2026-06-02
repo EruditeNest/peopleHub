@@ -80,35 +80,32 @@ public class TeamController {
     }
 
     @PostMapping("/{teamId}/members/add")
-    public ResponseEntity<Void> addMembersById(
+    public ResponseEntity<Void> addMemberByIds(
             @PathVariable Long teamId,
             @RequestBody List<Long> memberIds) {
 
-        teamService.addMembersById(teamId, memberIds);
+        teamService.addMemberByIds(teamId, memberIds);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{teamId}/members/remove")
-    public ResponseEntity<Void> removeMembersById(
+    public ResponseEntity<Void> removeMemberByIds(
             @PathVariable Long teamId,
             @RequestBody List<Long> memberIds) {
 
-        teamService.removeMembersById(teamId, memberIds);
+        teamService.removeMemberByIds(teamId, memberIds);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{teamId}/members")
     public ResponseEntity<RestApiResponse> getMembers(
-            @PathVariable Long teamId) {
-        RestApiResponse response = teamService.getMembers(teamId);
-        return ResponseEntity.ok(response);
-    }
-
-    // PROJECTS
-    @GetMapping("/{teamId}/projects")
-    public ResponseEntity<RestApiResponse> getProjects(
-            @PathVariable Long teamId) {
-        RestApiResponse response = teamService.getProjects(teamId);
+            @PathVariable Long teamId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "created_at") String sortField,
+            @RequestParam(defaultValue = "desc") String sortOrder
+    ) {
+        RestApiResponse response = teamService.getMembers(teamId, page, size, sortField, sortOrder);
         return ResponseEntity.ok(response);
     }
 }

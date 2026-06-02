@@ -113,6 +113,11 @@ public class UserService {
         return RestApiResponse.success(pageInfo, users.getContent());
     }
 
+    public RestApiResponse getAllUserByIds(List<Long> userIds) {
+        List<User> users = userRepo.findAllById(userIds);
+        return RestApiResponse.success(users);
+    }
+
     public RestApiResponse getUserByUsername(String username) {
         User user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("User", username));
