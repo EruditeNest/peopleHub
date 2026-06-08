@@ -1,10 +1,13 @@
 package com.people.hub.leavemanagement.model;
 
+import com.people.hub.leavemanagement.enums.LeaveTransactionSource;
 import com.people.hub.leavemanagement.enums.LeaveTransactionType;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
-import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,14 +25,22 @@ public class LeaveTransaction {
     private Long leaveApplicationId;
 
     @Enumerated(EnumType.STRING)
-    private LeaveTransactionType leaveTransactionType;
+    private LeaveTransactionSource leaveTransactionSource;
 
     @Enumerated(EnumType.STRING)
-    private LeaveTransactionType transactionType;
+    private LeaveTransactionType leaveTransactionType;
 
-    private BigDecimal days;
+    private Float days;
 
     private String remarks;
 
     private LocalDateTime transactionDate;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 }

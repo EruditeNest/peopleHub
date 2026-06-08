@@ -1,5 +1,6 @@
 package com.people.hub.common.utilities;
 
+import com.people.hub.common.dto.PaginationInfo;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -25,5 +26,18 @@ public final class PageableUtils {
                 : Sort.by(sortField).descending();
 
         return PageRequest.of(page, size, sort);
+    }
+
+    public static Pageable getPageable(
+            PaginationInfo paginationInfo,
+            Collection<String> allowedSortFields){
+        if (!allowedSortFields.contains(paginationInfo.getSortField())) {
+            paginationInfo.setSortField("created_at");
+        }
+        Sort sort = paginationInfo.getSortOrder().equalsIgnoreCase("asc")
+                ? Sort.by(paginationInfo.getSortField()).ascending()
+                : Sort.by(paginationInfo.getSortField()).descending();
+
+        return PageRequest.of(paginationInfo.getPage(), paginationInfo.getSize(), sort);
     }
 }

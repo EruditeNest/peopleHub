@@ -3,8 +3,10 @@ package com.people.hub.leavemanagement.model;
 import com.people.hub.leavemanagement.enums.LeaveStatus;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
-import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,7 +25,7 @@ public class LeaveApplication {
 
     private LocalDateTime endDate;
 
-    private BigDecimal totalDays;
+    private Float totalDays;
 
     private LeaveStatus status;
 
@@ -45,4 +47,12 @@ public class LeaveApplication {
     private LocalDateTime approvedAt;
 
     private LocalDateTime rejectedAt;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 }

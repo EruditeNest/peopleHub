@@ -7,5 +7,6 @@ public enum LeaveTransactionType {
     REJECT,
     CANCEL,
     CARRY_FORWARD,
-    ADJUSTMENT
+    ADJUSTMENT,
+    HOLD
 }

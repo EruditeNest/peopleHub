@@ -2,22 +2,13 @@ package com.people.hub.leavemanagement.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
-import java.math.BigDecimal;
+import java.time.Instant;
 
 @Entity
 @Data
-@Table(
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        columnNames = {
-                                "employeeId",
-                                "leaveTypeId",
-                                "leaveYear"
-                        }
-                )
-        }
-)
 public class LeaveBalance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,15 +18,23 @@ public class LeaveBalance {
 
     private Long leaveTypeId;
 
-    private Integer leaveYear;
+    private String financialYear;
 
-    private BigDecimal allocatedLeaves;
+    private Float allocatedLeaves;
 
-    private BigDecimal usedLeaves;
+    private Float usedLeaves;
 
-    private BigDecimal pendingLeaves;
+    private Float pendingLeaves;
 
-    private BigDecimal availableLeaves;
+    private Float availableLeaves;
 
-    private BigDecimal carryForwardLeaves;
+    private Float carryForwardLeaves;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 }
