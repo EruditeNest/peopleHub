@@ -1,6 +1,7 @@
 package com.people.hub.taskmanager.controller;
 
 import com.people.hub.common.RestApiResponse;
+import com.people.hub.security.MyUserDetail;
 import com.people.hub.taskmanager.dto.ChecklistDto;
 import com.people.hub.taskmanager.dto.TaskDto;
 import com.people.hub.taskmanager.dto.TimeLogDto;
@@ -9,11 +10,11 @@ import com.people.hub.taskmanager.model.Task;
 import com.people.hub.taskmanager.model.TaskChecklist;
 import com.people.hub.taskmanager.model.TaskTimeLog;
 import com.people.hub.taskmanager.service.TaskService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,10 +31,9 @@ public class TaskController {
     @PostMapping("/create")
     public ResponseEntity<Task> createTask(
             @RequestBody TaskDto taskDto,
-            HttpServletRequest request) {
+            @AuthenticationPrincipal MyUserDetail userDetail) {
 
-        Long userId = (Long) request.getAttribute("userId");
-        return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(taskDto, userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(taskDto, userDetail.getUserId()));
     }
 
     @GetMapping("/{taskId}")
@@ -107,29 +107,26 @@ public class TaskController {
     @PostMapping("/checklists/add")
     public ResponseEntity<TaskChecklist> addChecklist(
             @RequestBody ChecklistDto checklistDto,
-            HttpServletRequest request) {
+            @AuthenticationPrincipal MyUserDetail userDetail) {
 
-        Long userId = (Long) request.getAttribute("userId");
-        return ResponseEntity.ok(taskService.addChecklist(checklistDto, userId));
+        return ResponseEntity.ok(taskService.addChecklist(checklistDto, userDetail.getUserId()));
     }
 
     @PostMapping("/checklists/update/{checklistId}")
     public ResponseEntity<TaskChecklist> updateChecklist(
             @PathVariable Long checklistId,
             @RequestBody ChecklistDto checklistDto,
-            HttpServletRequest request) {
+            @AuthenticationPrincipal MyUserDetail userDetail) {
 
-        Long userId = (Long) request.getAttribute("userId");
-        return ResponseEntity.ok(taskService.updateChecklist(checklistId, checklistDto, userId));
+        return ResponseEntity.ok(taskService.updateChecklist(checklistId, checklistDto, userDetail.getUserId()));
     }
 
     @PostMapping("/checklists/complete/{checklistId}")
     public ResponseEntity<RestApiResponse> markChecklistComplete(
             @PathVariable Long checklistId,
-            HttpServletRequest request) {
+            @AuthenticationPrincipal MyUserDetail userDetail) {
 
-        Long userId = (Long) request.getAttribute("userId");
-        return ResponseEntity.ok(taskService.markChecklistComplete(checklistId, userId));
+        return ResponseEntity.ok(taskService.markChecklistComplete(checklistId, userDetail.getUserId()));
     }
 
     @PostMapping("/checklists/un-complete/{checklistId}")

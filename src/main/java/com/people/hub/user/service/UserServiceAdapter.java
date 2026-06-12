@@ -34,4 +34,9 @@ public class UserServiceAdapter implements UserServicePort {
     public Set<Long> getAllActiveUserIds(List<Long> ids){
         return userService.getAllActiveUserIds(ids);
     }
+
+    @Override
+    public List<Long> getAllUserIds(){
+        return userService.getAllUserIds();
+    };
 }

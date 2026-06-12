@@ -13,4 +13,6 @@ public interface UserServicePort {
     boolean activeUserExistsById(Long id);
 
     Set<Long> getAllActiveUserIds(List<Long> ids);
+
+    List<Long> getAllUserIds();
 }
