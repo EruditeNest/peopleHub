@@ -51,6 +51,16 @@ public class LeaveTypeService {
         return RestApiResponse.success(leaveTypeList);
     }
 
+    public List<LeaveType> getAllLeaveTypesList() {
+        return leaveTypeRepo.findAll();
+    }
+
+    public List<Long> getAllLeaveTypeIds() {
+        return leaveTypeRepo.findAll().stream()
+                .map(LeaveType::getId)
+                .toList();
+    }
+
     public RestApiResponse getActiveLeaveTypes() {
         List<LeaveType> leaveTypeList = leaveTypeRepo.findByActiveTrue();
         return RestApiResponse.success(leaveTypeList);

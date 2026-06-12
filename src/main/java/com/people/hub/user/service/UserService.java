@@ -75,6 +75,12 @@ public class UserService {
         return user;
     }
 
+    public List<Long> getAllUserIds() {
+        return userRepo.findAll().stream()
+                .map(User::getUserId)
+                .toList();
+    }
+
     public RestApiResponse getAllUsers(int page, int size, String sortField, String sortOrder) {
         log.info("getAllUsers with page: {}, size: {}, sortField: {}, sortOrder: {}", page, size, sortField, sortOrder);
         Pageable pageable = PageableUtils.getPageable(page, size, sortField, sortOrder, ALLOWED_SORT_FIELDS);

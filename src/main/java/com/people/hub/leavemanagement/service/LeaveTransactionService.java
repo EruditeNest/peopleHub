@@ -36,6 +36,12 @@ public class LeaveTransactionService {
         return transactionRepo.save(leaveTransaction);
     }
 
+    public RestApiResponse getHistoryByEmployeeIdLeaveTypeIdTransactionType(Long employeeId, Long leaveTypeId, LeaveTransactionType transactionType) {
+        return RestApiResponse.success(
+                transactionRepo.findByEmployeeIdAndLeaveTypeIdAndLeaveTransactionType(
+                        employeeId, leaveTypeId, transactionType));
+    }
+
     public Float getTotalDaysByTransactionType(Long employeeId, Long leaveTypeId, LeaveTransactionType transactionType) {
         return transactionRepo.getTotalDaysByTransactionType(employeeId, leaveTypeId, transactionType);
     }
@@ -168,6 +174,38 @@ public class LeaveTransactionService {
                 null,
                 LeaveTransactionSource.ALLOCATION,
                 LeaveTransactionType.ALLOCATION,
+                days,
+                remarks);
+    }
+
+    public LeaveTransaction recordAdjustmentAllocation(
+            Long employeeId,
+            Long leaveTypeId,
+            float days,
+            String remarks) {
+
+        return createTransaction(
+                employeeId,
+                leaveTypeId,
+                null,
+                LeaveTransactionSource.ADJUSTMENT,
+                LeaveTransactionType.ADJUSTMENT,
+                days,
+                remarks);
+    }
+
+    public LeaveTransaction recordCarryForward(
+            Long employeeId,
+            Long leaveTypeId,
+            float days,
+            String remarks) {
+
+        return createTransaction(
+                employeeId,
+                leaveTypeId,
+                null,
+                LeaveTransactionSource.CARRY_FORWARD,
+                LeaveTransactionType.CARRY_FORWARD,
                 days,
                 remarks);
     }

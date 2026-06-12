@@ -9,15 +9,5 @@ public class LeaveBalanceDto {
 
     private Long leaveTypeId;
 
-    private String financialYear;
-
-    private Float allocatedLeaves;
-
-    private Float usedLeaves;
-
-    private Float pendingLeaves;
-
-    private Float availableLeaves;
-
-    private Float carryForwardLeaves;
+    private float allocatedLeaves = 0f;
 }

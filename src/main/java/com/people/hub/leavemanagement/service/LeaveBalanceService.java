@@ -10,12 +10,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class LeaveBalanceService {
     private final LeaveBalanceRepo leaveBalanceRepo;
+    private final LeaveTransactionService transactionService;
+    private final LeaveTypeService typeService;
 
     public LeaveBalance createLeaveBalance(LeaveBalanceDto leaveBalanceDto){
         LeaveBalance leaveBalance = new LeaveBalance();
@@ -26,30 +29,82 @@ public class LeaveBalanceService {
         String financialYear = getFinancialYear(LocalDate.now());
         leaveBalance.setFinancialYear(financialYear);
 
-        Float availableLeaves = leaveBalanceDto.getAllocatedLeaves() + leaveBalanceDto.getCarryForwardLeaves();
+        Float previousAvailableLeave = previousAvailableLeaves(leaveBalanceDto.getEmployeeId(), leaveBalanceDto.getLeaveTypeId());
+        Float maxCarryForward = typeService.getMaxCarryForward(leaveBalanceDto.getLeaveTypeId());
+        float carryForwardLeaves = typeService.isCarryForwardAllowed(leaveBalanceDto.getLeaveTypeId()) ?
+                previousAvailableLeave > maxCarryForward ?
+                maxCarryForward :
+                previousAvailableLeave :
+                0f;
+        if(carryForwardLeaves > 0) {
+            transactionService.recordCarryForward(
+                    leaveBalance.getEmployeeId(),
+                    leaveBalance.getLeaveTypeId(),
+                    carryForwardLeaves,
+                    "Carry forward added while creation"
+            );
+        }
+        Float availableLeaves = leaveBalanceDto.getAllocatedLeaves() + carryForwardLeaves;
         leaveBalance.setAvailableLeaves(availableLeaves);
 
         leaveBalance.setPendingLeaves(0f);
         leaveBalance.setUsedLeaves(0f);
-        leaveBalance.setCarryForwardLeaves(leaveBalanceDto.getCarryForwardLeaves());
+        leaveBalance.setCarryForwardLeaves(carryForwardLeaves);
         return leaveBalanceRepo.save(leaveBalance);
     }
 
-    public LeaveBalance updateLeaveBalance(Long leaveBalanceId, LeaveBalanceDto leaveBalanceDto){
+    public RestApiResponse bulkCreateLeaveBalance(List<LeaveBalanceDto> leaveBalanceDtoList){
+        List<LeaveBalance> leaveBalanceList = new ArrayList<>();
+        for(LeaveBalanceDto leaveBalanceDto: leaveBalanceDtoList) {
+            LeaveBalance leaveBalance = new LeaveBalance();
+            leaveBalance.setAllocatedLeaves(leaveBalanceDto.getAllocatedLeaves());
+            leaveBalance.setLeaveTypeId(leaveBalanceDto.getLeaveTypeId());
+            leaveBalance.setEmployeeId(leaveBalanceDto.getEmployeeId());
+
+            String financialYear = getFinancialYear(LocalDate.now());
+            leaveBalance.setFinancialYear(financialYear);
+
+            Float previousAvailableLeave = previousAvailableLeaves(leaveBalanceDto.getEmployeeId(), leaveBalanceDto.getLeaveTypeId());
+            Float maxCarryForward = typeService.getMaxCarryForward(leaveBalanceDto.getLeaveTypeId());
+            float carryForwardLeaves = typeService.isCarryForwardAllowed(leaveBalanceDto.getLeaveTypeId()) ?
+                    previousAvailableLeave > maxCarryForward ?
+                            maxCarryForward :
+                            previousAvailableLeave :
+                    0f;
+            if(carryForwardLeaves > 0) {
+                transactionService.recordCarryForward(
+                        leaveBalance.getEmployeeId(),
+                        leaveBalance.getLeaveTypeId(),
+                        carryForwardLeaves,
+                        "Carry forward added while bulk creation"
+                );
+            }
+            Float availableLeaves = leaveBalanceDto.getAllocatedLeaves() + carryForwardLeaves;
+            leaveBalance.setAvailableLeaves(availableLeaves);
+
+            leaveBalance.setPendingLeaves(0f);
+            leaveBalance.setUsedLeaves(0f);
+            leaveBalance.setCarryForwardLeaves(carryForwardLeaves);
+            leaveBalanceList.add(leaveBalance);
+        }
+        return RestApiResponse.success(leaveBalanceRepo.saveAll(leaveBalanceList));
+    }
+
+    public LeaveBalance updateLeaveBalance(Long leaveBalanceId, float days){
         LeaveBalance leaveBalance = getLeaveBalanceById(leaveBalanceId);
-        leaveBalance.setAllocatedLeaves(leaveBalanceDto.getAllocatedLeaves());
-        leaveBalance.setLeaveTypeId(leaveBalanceDto.getLeaveTypeId());
-        leaveBalance.setEmployeeId(leaveBalanceDto.getEmployeeId());
+        leaveBalance.setAllocatedLeaves(days);
 
-        String financialYear = getFinancialYear(LocalDate.now());
-        leaveBalance.setFinancialYear(financialYear);
-
-        Float availableLeaves = leaveBalanceDto.getAllocatedLeaves() + leaveBalanceDto.getCarryForwardLeaves();
+        Float availableLeaves = days + leaveBalance.getCarryForwardLeaves();
         leaveBalance.setAvailableLeaves(availableLeaves);
+        return leaveBalanceRepo.save(leaveBalance);
+    }
 
-        leaveBalance.setPendingLeaves(0f);
-        leaveBalance.setUsedLeaves(0f);
-        leaveBalance.setCarryForwardLeaves(leaveBalanceDto.getCarryForwardLeaves());
+    public LeaveBalance updateCarryForward(Long leaveBalanceId, float days){
+        LeaveBalance leaveBalance = getLeaveBalanceById(leaveBalanceId);
+        leaveBalance.setCarryForwardLeaves(days);
+
+        Float availableLeaves = days + leaveBalance.getAllocatedLeaves();
+        leaveBalance.setAvailableLeaves(availableLeaves);
         return leaveBalanceRepo.save(leaveBalance);
     }
 
@@ -129,5 +184,19 @@ public class LeaveBalanceService {
             return year + "-" + String.valueOf(year + 1).substring(2);
         }
         return (year - 1) + "-" + String.valueOf(year).substring(2);
+    }
+
+    private Float previousAvailableLeaves(
+            Long employeeId,
+            Long leaveTypeId){
+        String previousFinancialYear = getFinancialYear(LocalDate.now().minusYears(1));
+
+        return leaveBalanceRepo
+                .findByEmployeeIdAndLeaveTypeIdAndFinancialYear(
+                        employeeId,
+                        leaveTypeId,
+                        previousFinancialYear)
+                .map(LeaveBalance::getAvailableLeaves)
+                .orElse(0f);
     }
 }
