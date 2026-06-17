@@ -1,8 +1,8 @@
 package com.people.hub.attendancemanagement.service;
 
-import com.company.attendance.dto.PunchResponse;
-import com.company.attendance.entity.AttendancePunch;
-import com.company.attendance.repository.AttendancePunchRepository;
+import com.people.hub.attendancemanagement.dto.PunchResponse;
+import com.people.hub.attendancemanagement.model.AttendancePunch;
+import com.people.hub.attendancemanagement.repository.AttendancePunchRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

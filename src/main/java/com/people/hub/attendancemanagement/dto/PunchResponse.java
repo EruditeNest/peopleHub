@@ -1,7 +1,7 @@
 package com.people.hub.attendancemanagement.dto;
 
-import com.company.attendance.enums.PunchDirection;
-import com.company.attendance.enums.VerifyMode;
+import com.people.hub.attendancemanagement.enums.PunchDirection;
+import com.people.hub.attendancemanagement.enums.VerifyMode;
 import java.time.LocalDateTime;
 
 /** Read-only projection of AttendancePunch exposed via the application API.

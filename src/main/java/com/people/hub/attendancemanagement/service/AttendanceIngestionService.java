@@ -1,13 +1,13 @@
 package com.people.hub.attendancemanagement.service;
 
-import com.company.attendance.dto.ParsedPunchLine;
-import com.company.attendance.entity.AttendancePunch;
-import com.company.attendance.entity.BiometricDevice;
-import com.company.attendance.entity.EmployeeDeviceMapping;
-import com.company.attendance.exception.UnknownDeviceException;
-import com.company.attendance.repository.AttendancePunchRepository;
-import com.company.attendance.repository.BiometricDeviceRepository;
-import com.company.attendance.repository.EmployeeDeviceMappingRepository;
+import com.people.hub.attendancemanagement.dto.ParsedPunchLine;
+import com.people.hub.attendancemanagement.model.AttendancePunch;
+import com.people.hub.attendancemanagement.model.BiometricDevice;
+import com.people.hub.attendancemanagement.model.EmployeeDeviceMapping;
+import com.people.hub.attendancemanagement.exception.UnknownDeviceException;
+import com.people.hub.attendancemanagement.repository.AttendancePunchRepository;
+import com.people.hub.attendancemanagement.repository.BiometricDeviceRepository;
+import com.people.hub.attendancemanagement.repository.EmployeeDeviceMappingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;

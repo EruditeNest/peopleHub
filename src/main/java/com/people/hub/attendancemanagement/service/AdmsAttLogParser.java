@@ -1,8 +1,8 @@
 package com.people.hub.attendancemanagement.service;
 
-import com.company.attendance.dto.ParsedPunchLine;
-import com.company.attendance.enums.PunchDirection;
-import com.company.attendance.enums.VerifyMode;
+import com.people.hub.attendancemanagement.dto.ParsedPunchLine;
+import com.people.hub.attendancemanagement.enums.PunchDirection;
+import com.people.hub.attendancemanagement.enums.VerifyMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

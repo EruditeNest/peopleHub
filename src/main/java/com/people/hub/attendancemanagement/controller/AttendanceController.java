@@ -1,7 +1,7 @@
 package com.people.hub.attendancemanagement.controller;
 
-import com.company.attendance.dto.PunchResponse;
-import com.company.attendance.service.AttendanceQueryService;
+import com.people.hub.attendancemanagement.dto.PunchResponse;
+import com.people.hub.attendancemanagement.service.AttendanceQueryService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

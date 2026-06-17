@@ -1,10 +1,10 @@
 package com.people.hub.attendancemanagement.controller;
 
-import com.company.attendance.dto.ParsedPunchLine;
-import com.company.attendance.entity.BiometricDevice;
-import com.company.attendance.exception.UnknownDeviceException;
-import com.company.attendance.service.AdmsAttLogParser;
-import com.company.attendance.service.AttendanceIngestionService;
+import com.people.hub.attendancemanagement.dto.ParsedPunchLine;
+import com.people.hub.attendancemanagement.model.BiometricDevice;
+import com.people.hub.attendancemanagement.exception.UnknownDeviceException;
+import com.people.hub.attendancemanagement.service.AdmsAttLogParser;
+import com.people.hub.attendancemanagement.service.AttendanceIngestionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;

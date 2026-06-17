@@ -1,6 +1,6 @@
 package com.people.hub.attendancemanagement.repository;
 
-import com.company.attendance.entity.BiometricDevice;
+import com.people.hub.attendancemanagement.model.BiometricDevice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

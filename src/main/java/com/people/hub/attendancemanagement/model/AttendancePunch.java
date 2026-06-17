@@ -1,7 +1,7 @@
 package com.people.hub.attendancemanagement.model;
 
-import com.company.attendance.enums.PunchDirection;
-import com.company.attendance.enums.VerifyMode;
+import com.people.hub.attendancemanagement.enums.PunchDirection;
+import com.people.hub.attendancemanagement.enums.VerifyMode;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
