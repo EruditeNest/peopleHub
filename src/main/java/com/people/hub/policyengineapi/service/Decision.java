@@ -1,6 +1,6 @@
 package com.people.hub.policyengineapi.service;
 
-public interface DecisionType {
+public interface Decision {
     String getCode();
 
     String getDisplayName();

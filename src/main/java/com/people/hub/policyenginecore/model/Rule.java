@@ -1,12 +1,15 @@
 package com.people.hub.policyenginecore.model;
 
-import com.people.hub.policyengineapi.service.AttributeDefinition;
-import com.people.hub.policyengineapi.service.DecisionType;
+import com.people.hub.policyengineapi.enums.DataType;
 import com.people.hub.policyenginecore.enums.Operator;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
+import java.time.Instant;
 
 @Entity
 @Data
@@ -17,12 +20,32 @@ public class Rule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private AttributeDefinition attribute;
+    @Column(name = "policy_id", nullable = false)
+    private Long policyId;
+
+    private Integer priority;
+
+    private String attributeIdentifier;
 
     @Enumerated(EnumType.STRING)
     private Operator operator;
 
-    @JoinColumn
-    private DecisionType decision;
+    @Enumerated(EnumType.STRING)
+    private DataType constantType;
+
+    private String constantValue;
+
+    @Column(name = "decision", columnDefinition = "jsonb", nullable = false)
+    private String decision;
+
+    @Column(nullable = false)
+    private boolean active;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 }

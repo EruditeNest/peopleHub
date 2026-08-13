@@ -16,4 +16,6 @@ public interface DataSource {
             List<AttributeIdentifier> attributes,
             Map<AttributeIdentifier, Object> dependencies
     );
+
+    Decision getDecisionByCode(String decisionCode);
 }
