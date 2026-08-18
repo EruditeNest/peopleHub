@@ -1,4 +1,4 @@
-package com.people.hub.policyenginecore.dto;
+package com.people.hub.policyengineapi.dto;
 
 import com.people.hub.policyengineapi.enums.DataType;
 import lombok.AllArgsConstructor;

@@ -7,6 +7,8 @@ import java.util.Map;
 
 public interface DataSource {
 
+    String getService();
+
     // Adjacency Matrix
     // Returns a map. Keys are attributes that the DataSource can fetch. Values are the attributes whose values it requires to fetch the key.
     Map<AttributeIdentifier, List<AttributeIdentifier>> listSupportedAttributes();
@@ -16,6 +18,4 @@ public interface DataSource {
             List<AttributeIdentifier> attributes,
             Map<AttributeIdentifier, Object> dependencies
     );
-
-    Decision getDecisionByCode(String decisionCode);
 }
