@@ -1,9 +1,11 @@
 package com.people.hub.leavemanagement.service;
 
+import com.people.hub.leavemanagement.enums.LeaveModuleDefinition;
 import com.people.hub.policyengineapi.dto.DecisionDefinition;
 import com.people.hub.policyengineapi.service.Decision;
 import com.people.hub.policyengineapi.service.DecisionDefinitionFactory;
 import com.people.hub.policyengineapi.service.DecisionDefinitionProvider;
+import com.people.hub.policyengineapi.service.ModuleDefinition;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -28,11 +30,6 @@ public class LeaveDecisionDefinitionProvider implements DecisionDefinitionProvid
     }
 
     @Override
-    public String getService() {
-        return "leave";
-    }
-
-    @Override
     public boolean supports(String decisionCode) {
         return definitions.containsKey(decisionCode);
     }
@@ -45,5 +42,10 @@ public class LeaveDecisionDefinitionProvider implements DecisionDefinitionProvid
     @Override
     public Collection<DecisionDefinition> getDefinitions() {
         return definitions.values();
+    }
+
+    @Override
+    public ModuleDefinition getModule() {
+        return LeaveModuleDefinition.INSTANCE;
     }
 }

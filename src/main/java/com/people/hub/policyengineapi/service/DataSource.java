@@ -5,9 +5,11 @@ import com.people.hub.policyengineapi.dto.AttributeIdentifier;
 import java.util.List;
 import java.util.Map;
 
-public interface DataSource {
+public interface DataSource extends ModuleComponent {
 
-    String getService();
+    default String getService() {
+        return getModule().getCode();
+    }
 
     // Adjacency Matrix
     // Returns a map. Keys are attributes that the DataSource can fetch. Values are the attributes whose values it requires to fetch the key.

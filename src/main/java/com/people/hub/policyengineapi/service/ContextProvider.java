@@ -2,9 +2,11 @@ package com.people.hub.policyengineapi.service;
 
 import java.util.Map;
 
-public interface ContextProvider {
+public interface ContextProvider extends ModuleComponent {
 
-    String getService();
+    default String getService() {
+        return getModule().getCode();
+    }
 
     Map<String, ContextDefinition> getContexts();
 }

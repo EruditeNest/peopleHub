@@ -4,9 +4,11 @@ import com.people.hub.policyengineapi.dto.DecisionDefinition;
 
 import java.util.Collection;
 
-public interface DecisionDefinitionProvider {
+public interface DecisionDefinitionProvider extends ModuleComponent {
 
-    String getService();
+    default String getService() {
+        return getModule().getCode();
+    }
 
     boolean supports(String decisionCode);
 
