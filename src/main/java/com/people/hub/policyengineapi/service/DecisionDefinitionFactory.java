@@ -37,7 +37,8 @@ public class DecisionDefinitionFactory {
                 DataType.fromJavaType(field.getType()),
                 annotation.required(),
                 resolveDisplayName(field, annotation),
-                annotation.description()
+                annotation.description(),
+                getAllowedValues(field.getType())
         );
     }
 
@@ -50,5 +51,14 @@ public class DecisionDefinitionFactory {
         }
 
         return field.getName();
+    }
+
+    private List<String> getAllowedValues(Class<?> fieldType) {
+        if (!fieldType.isEnum()) {
+            return null;
+        }
+        return Arrays.stream(fieldType.getEnumConstants())
+                .map(value -> ((Enum<?>) value).name())
+                .toList();
     }
 }

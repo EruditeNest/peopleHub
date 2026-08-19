@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,4 +16,5 @@ public class DecisionFieldDefinition {
     private boolean required;
     private String displayName;
     private String description;
+    private List<String> allowedValues;
 }

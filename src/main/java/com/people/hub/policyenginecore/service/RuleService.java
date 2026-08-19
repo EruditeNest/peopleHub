@@ -1,6 +1,5 @@
 package com.people.hub.policyenginecore.service;
 
-import com.people.hub.policyengineapi.service.Decision;
 import com.people.hub.policyenginecore.dto.RuleRequestDto;
 import com.people.hub.policyenginecore.model.Policy;
 import com.people.hub.policyenginecore.model.Rule;
@@ -17,6 +16,12 @@ public class RuleService {
 
     public Rule createRule(RuleRequestDto requestDto) {
         Policy policy = policyService.getPolicyById(requestDto.getPolicyId());
+
+        decisionService.validateDecision(
+                policy.getServiceCode(),
+                policy.getContextCode(),
+                requestDto.getDecision()
+        );
 
         Rule rule = new Rule();
         rule.setPolicyId(policy.getId());

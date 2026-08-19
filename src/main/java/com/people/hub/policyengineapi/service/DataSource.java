@@ -5,7 +5,7 @@ import com.people.hub.policyengineapi.dto.AttributeIdentifier;
 import java.util.List;
 import java.util.Map;
 
-public interface DataSource extends ModuleComponent {
+public interface DataSource extends ModuleProvider {
 
     default String getService() {
         return getModule().getCode();

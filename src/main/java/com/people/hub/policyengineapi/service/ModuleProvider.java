@@ -1,5 +1,5 @@
 package com.people.hub.policyengineapi.service;
 
-public interface ModuleComponent {
+public interface ModuleProvider {
     ModuleDefinition getModule();
 }

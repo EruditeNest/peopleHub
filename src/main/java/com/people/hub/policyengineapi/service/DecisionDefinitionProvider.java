@@ -4,7 +4,7 @@ import com.people.hub.policyengineapi.dto.DecisionDefinition;
 
 import java.util.Collection;
 
-public interface DecisionDefinitionProvider extends ModuleComponent {
+public interface DecisionDefinitionProvider extends ModuleProvider {
 
     default String getService() {
         return getModule().getCode();

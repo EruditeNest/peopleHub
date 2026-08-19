@@ -26,6 +26,9 @@ public class Policy {
     private String name;
 
     @Column(nullable = false)
+    private String serviceCode;
+
+    @Column(nullable = false)
     private String contextCode;
 
     @Column(nullable = false)
