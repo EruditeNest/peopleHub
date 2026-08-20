@@ -36,4 +36,29 @@ public enum DataType {
         }
         throw new IllegalArgumentException("Unsupported decision field type: " + type.getName());
     }
+
+    public static Class<?> fromDataType(DataType type) {
+        if (type.equals(STRING)) {
+            return String.class;
+        }
+        if (type.equals(INTEGER)) {
+            return Integer.class;
+        }
+        if (type.equals(LONG)) {
+            return Long.class;
+        }
+        if (type.equals(DECIMAL)) {
+            return BigDecimal.class;
+        }
+        if (type.equals(BOOLEAN)) {
+            return Boolean.class;
+        }
+        if (type.equals(DATETIME)) {
+            return LocalDateTime.class;
+        }
+        if (type.equals(ENUM)) {
+            return Enum.class;
+        }
+        throw new IllegalArgumentException("Unsupported decision field type: " + type);
+    }
 }

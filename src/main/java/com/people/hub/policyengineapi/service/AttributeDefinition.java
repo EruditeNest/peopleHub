@@ -7,5 +7,7 @@ public interface AttributeDefinition {
 
     AttributeIdentifier getIdentifier();
 
+    String getIdentifierString();
+
     DataType getDataType();
 }

@@ -17,12 +17,8 @@ import java.util.List;
 public class DecisionService {
     private final DecisionDefinitionRegistry definitionRegistry;
 
-    public DecisionDefinition getDecisionDefinition(String service, String contextCode) {
-        return definitionRegistry.getDefinition(service, contextCode);
-    }
-
-    public void validateDecision(String service, String contextCode, JsonNode decision) {
-        DecisionDefinition definition = getDecisionDefinition(service, contextCode);
+    public void validateDecision(String service, String decisionCode, JsonNode decision) {
+        DecisionDefinition definition = definitionRegistry.getDefinition(service, decisionCode);
 
         List<String> errors = new ArrayList<>();
 
@@ -45,7 +41,7 @@ public class DecisionService {
             }
         }
         if (!errors.isEmpty()) {
-            throw new DecisionValidationException(contextCode, errors);
+            throw new DecisionValidationException(decisionCode, errors);
         }
     }
 
@@ -68,10 +64,7 @@ public class DecisionService {
         }
     }
 
-    private void validateFieldDataType(
-            DecisionFieldDefinition field,
-            JsonNode value
-    ) {
+    private void validateFieldDataType(DecisionFieldDefinition field, JsonNode value) {
         boolean valid = switch (field.getDataType()) {
             case STRING -> value.isTextual();
 
@@ -88,19 +81,11 @@ public class DecisionService {
             case ENUM -> value.isTextual();
         };
         if (!valid) {
-            throw new IllegalArgumentException(
-                    "Invalid type for decision field '"
-                            + field.getName()
-                            + "'. Expected "
-                            + field.getDataType()
-            );
+            throw new IllegalArgumentException("Invalid type for decision field '" + field.getName() + "'. Expected " + field.getDataType());
         }
     }
 
-    private void validateFieldAllowedValues(
-            DecisionFieldDefinition field,
-            JsonNode value
-    ) {
+    private void validateFieldAllowedValues(DecisionFieldDefinition field, JsonNode value) {
         List<String> allowedValues = field.getAllowedValues();
         if (allowedValues == null || allowedValues.isEmpty()) {
             return;

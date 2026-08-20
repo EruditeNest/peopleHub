@@ -27,6 +27,11 @@ public enum LeaveAttributeDefinition implements AttributeDefinition {
     }
 
     @Override
+    public String getIdentifierString() {
+        return identifier.value();
+    }
+
+    @Override
     public DataType getDataType() {
         return dataType;
     }

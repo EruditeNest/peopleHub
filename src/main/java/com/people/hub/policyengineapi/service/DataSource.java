@@ -20,4 +20,8 @@ public interface DataSource extends ModuleProvider {
             List<AttributeIdentifier> attributes,
             Map<AttributeIdentifier, Object> dependencies
     );
+
+    AttributeDefinition getAttributeByIdentifier(String identifier);
+
+    List<AttributeDefinition> getAllAttributeDefinitions();
 }

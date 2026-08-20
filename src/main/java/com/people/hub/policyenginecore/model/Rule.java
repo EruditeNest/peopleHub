@@ -1,11 +1,14 @@
 package com.people.hub.policyenginecore.model;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.people.hub.policyengineapi.enums.DataType;
 import com.people.hub.policyenginecore.enums.Operator;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -35,8 +38,9 @@ public class Rule {
 
     private String constantValue;
 
-    @Column(name = "decision", columnDefinition = "jsonb", nullable = false)
-    private String decision;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "decision", nullable = false)
+    private JsonNode decision;
 
     @Column(nullable = false)
     private boolean active;
