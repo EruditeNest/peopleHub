@@ -19,9 +19,6 @@ public class Policy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String code; // Naming convention Namespace.Name Example: leave.approval
-
     @Column(nullable = false)
     private String name;
 

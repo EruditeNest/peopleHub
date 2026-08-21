@@ -33,17 +33,17 @@ public class RuleController {
         return ResponseEntity.ok(ruleService.getRuleById(id));
     }
 
-    @GetMapping("/policy-id/{id}")
+    @GetMapping("/policy/{policyId}")
     public ResponseEntity<List<Rule>> getAllRulesByPolicyId(@PathVariable Long policyId){
         return ResponseEntity.ok(ruleService.getAllRulesByPolicyId(policyId));
     }
 
-    @GetMapping("/active-policy-id/{id}")
+    @GetMapping("/policy/{policyId}/active")
     public ResponseEntity<List<Rule>> getAllActiveRulesByPolicyId(@PathVariable Long policyId) {
         return ResponseEntity.ok(ruleService.getAllActiveRulesByPolicyId(policyId));
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public ResponseEntity<RestApiResponse> deleteRuleById(@PathVariable Long id) {
         return ResponseEntity.ok(ruleService.deleteRuleById(id));
     }

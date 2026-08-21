@@ -12,4 +12,6 @@ public interface RuleRepo extends JpaRepository<Rule, Long> {
     List<Rule> findAllByPolicyId(Long policyId);
 
     List<Rule> findAllByPolicyIdAndActiveTrue(Long policyId);
+
+    int deleteAllByPolicyId(Long policyId);
 }

@@ -92,6 +92,11 @@ public class RuleService {
         return RestApiResponse.success("Rule (" + id + ") deleted successfully!");
     }
 
+    public RestApiResponse deleteRuleByPolicyId(Long id) {
+        int rules = ruleRepo.deleteAllByPolicyId(id);
+        return RestApiResponse.success("Rules for PolicyId (" + id + ") deleted successfully! Number of rules are:" + rules);
+    }
+
     private void validateConstantType(String serviceCode, String attributeIdentifier, DataType type) {
         DataSource dataSource = dataSourceRegistry.getDataSource(serviceCode);
         AttributeDefinition attributeDefinition = dataSource.getAttributeByIdentifier(attributeIdentifier);
