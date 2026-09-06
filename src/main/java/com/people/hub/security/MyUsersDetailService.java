@@ -1,6 +1,7 @@
 package com.people.hub.security;
 
 import com.people.hub.common.exception.NotFoundException;
+import com.people.hub.common.service.AuthorityProvider;
 import com.people.hub.user.model.User;
 import com.people.hub.user.repository.UserRepo;
 import com.people.hub.user.repository.UserRoleRepo;

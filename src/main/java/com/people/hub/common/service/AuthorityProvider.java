@@ -1,4 +1,4 @@
-package com.people.hub.security;
+package com.people.hub.common.service;
 
 import java.util.Map;
 import java.util.Set;

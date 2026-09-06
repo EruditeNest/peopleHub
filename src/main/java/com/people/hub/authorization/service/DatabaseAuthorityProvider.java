@@ -3,7 +3,7 @@ package com.people.hub.authorization.service;
 import com.people.hub.authorization.model.Role;
 import com.people.hub.authorization.repository.RolePermissionRepo;
 import com.people.hub.authorization.repository.RoleRepo;
-import com.people.hub.security.AuthorityProvider;
+import com.people.hub.common.service.AuthorityProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
