@@ -1,6 +1,6 @@
 package com.people.hub.policyenginecore.service;
 
-import com.people.hub.policyengineapi.service.ContextDefinition;
+import com.people.hub.policyengineapi.dto.AttributeIdentifier;
 import com.people.hub.policyengineapi.service.DataSource;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +14,8 @@ public class DataSourceRegistry {
 
     private final Map<String, DataSource> dataSourceMap;
 
+    private final Map<AttributeIdentifier, List<DataSource>> providers;
+
     public DataSourceRegistry(List<DataSource> dataSources) {
 
         dataSourceMap = dataSources.stream()
@@ -21,9 +23,28 @@ public class DataSourceRegistry {
                         DataSource::getService,
                         Function.identity()
                 ));
+
+        providers = dataSources.stream()
+                .flatMap(dataSource ->
+                        dataSource.listSupportedAttributes()
+                                .keySet()
+                                .stream()
+                                .map(attribute ->
+                                        Map.entry(attribute, dataSource)))
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey,
+                        Collectors.mapping(
+                                Map.Entry::getValue,
+                                Collectors.toList()
+                        )
+                ));
     }
 
     public DataSource getDataSource(String service) {
         return dataSourceMap.get(service);
+    }
+
+    public List<DataSource> getDataSources(AttributeIdentifier attribute) {
+        return providers.getOrDefault(attribute, List.of());
     }
 }
